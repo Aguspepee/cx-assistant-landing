@@ -1,0 +1,28 @@
+{
+  "seoTitle": "About Us | Cx Assistant",
+  "seoDescription": "Learn who is behind Cx Assistant — an AI-powered commissioning platform built by engineers, for engineers.",
+  "title": "About Us",
+  "subtitle": "We're engineers who got tired of managing commissioning projects with spreadsheets.",
+  "mission": {
+    "label": "Our mission",
+    "text": "Cx Assistant exists to give commissioning teams their time back. We built the platform we wished we had — one that captures issues, tracks progress, and answers questions instantly, so teams can focus on actual engineering instead of status updates."
+  },
+  "story": {
+    "label": "How it started",
+    "text": "After years of working on complex industrial commissioning projects, we experienced first-hand how much time is lost hunting for information, chasing updates, and maintaining trackers. We started building Cx Assistant to change that — combining structured project data with AI so every answer is a message away."
+  },
+  "values": {
+    "label": "What we stand for",
+    "items": [
+      { "title": "Built for the field", "description": "Every feature is designed around how commissioning teams actually work — fast-moving, high-stakes, and detail-heavy." },
+      { "title": "Clarity over complexity", "description": "We strip away noise. Our platform is simple enough that new team members are productive on day one." },
+      { "title": "Data you can trust", "description": "Cx Assistant gives you real-time visibility into project status, backed by the data your team enters every day." }
+    ]
+  },
+  "cta": {
+    "title": "Ready to see it in action?",
+    "subtitle": "Start your free trial or get in touch — we'd love to show you around.",
+    "signUp": "Start free",
+    "contact": "Contact us"
+  }
+}

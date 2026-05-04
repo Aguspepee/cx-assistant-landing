@@ -1,0 +1,234 @@
+{
+  "hero": {
+    "badge": "REDEFINIENDO EL COMMISSIONING",
+    "phrases": [
+      "Potenciando el Commissioning",
+      "IA diseñada para ingenieros",
+      "Resuelve Issues más rápido",
+      "Planifica con facilidad"
+    ],
+    "subtitle": "Cx Assistant ayuda a los equipos de commissioning a registrar issues, planificar hitos y entregar proyectos más rápido con soporte de IA.",
+    "ctaPrimary": "Comenzar →",
+    "ctaSecondary": "Lee nuestro blog",
+    "chat": {
+      "online": "en línea",
+      "inputPlaceholder": "Escribe un mensaje…",
+      "disclaimer": "La IA puede cometer errores — verifica los detalles importantes.",
+      "greeting": "¡Hola! ¿En qué puedo ayudarte? 👋"
+    },
+    "chatTurns": [
+      {
+        "userText": "¡Hola! ¿Cuántos issues están abiertos?",
+        "assistantText": "📋 Hay 636 issues con estado 'abierto'.",
+        "thinkingLabel": "Consultando issues…"
+      },
+      {
+        "userText": "¿Cuál es el número de serie del #NL_IRE33_L0_028_UPS1B01?",
+        "assistantText": "El número de serie del #NL_IRE33_L0_028_UPS1B01 es 06-7M71593-01.",
+        "thinkingLabel": "Buscando asset…"
+      },
+      {
+        "userText": "¿Alguna novedad sobre el issue 456?",
+        "assistantText": "🔷 Historial del issue #456 — Strange Whine from TX03B Under Load:\n2025-08-01 · asignado a: Agustín Ezequiel\n2026-03-04 · estado: open → closed",
+        "thinkingLabel": "Obteniendo issue…"
+      },
+      {
+        "userText": "¿Puedes reabrir ese issue?",
+        "assistantText": "✅ Issue #456 \"Strange Whine from TX03B Under Load\" actualizado a estado Open.",
+        "thinkingLabel": "Actualizando issue…"
+      },
+      {
+        "userText": "Carga los datos de la nameplate al UPS1B01, por favor",
+        "assistantText": "🖨️ Nameplate leída para NL_IRE33_L0_028_UPS1B01 — confianza 90%",
+        "thinkingLabel": "Leyendo nameplate…"
+      },
+      {
+        "userText": "¿Me puedes dar un resumen de los issues?",
+        "assistantText": "¡Claro! Acabo de generar este gráfico 📊",
+        "thinkingLabel": "Analizando issues…"
+      },
+      {
+        "userText": "Crea un issue para el TX45 — sensor de temperatura averiado",
+        "assistantText": "✅ Issue creado con ID 874: \"TX45 temperature sensor broken\"",
+        "thinkingLabel": "Creando issue…"
+      },
+      {
+        "userText": "¿Me puedes dar el documento FAT del NL_IRE33_L0_025_BAT1A02?",
+        "assistantText": "Aquí está el documento FAT del BAT1A02:",
+        "thinkingLabel": "Obteniendo documento…"
+      }
+    ],
+    "nameplate": {
+      "applied": "✅ Aplicado (3)",
+      "voltage": "Tensión",
+      "serialNo": "N.º de serie",
+      "power": "Potencia"
+    },
+    "barChart": {
+      "title": "Issues por prioridad y estado",
+      "subtitle": "Distribución actual de issues"
+    },
+    "issueForm": {
+      "editing": "Editando Issue #874",
+      "titleLabel": "Título",
+      "descriptionLabel": "Descripción",
+      "assignedToLabel": "Asignado a",
+      "unassigned": "Sin asignar",
+      "statusLabel": "Estado",
+      "open": "Open",
+      "assignAction": "Asignar a Ana",
+      "closeAction": "Cerrar Issue"
+    }
+  },
+  "highlights": {
+    "title": "Todo en un solo lugar",
+    "subtitle": "Gestión de proyectos estructurada, buscable y segura, diseñada para la industria MEP y de commissioning.",
+    "assetTracking": {
+      "title": "Asset Tracking",
+      "description": "Rastrea cada equipo desde la entrega hasta el handover final con actualizaciones de estado detalladas y registros históricos."
+    },
+    "issueManagement": {
+      "title": "Issue Management",
+      "description": "Una \"punch list\" robusta y reinventada. Asigna responsabilidades, establece prioridades y rastrea resoluciones en tiempo real."
+    },
+    "documentation": {
+      "title": "Documentación",
+      "description": "Repositorio centralizado de checklists, scripts de prueba y certificaciones. Genera informes PDF profesionales con un solo clic."
+    }
+  },
+  "chatSection": {
+    "eyebrow": "ASISTENTE IA",
+    "title": "Tu proyecto,",
+    "titleHighlight": "siempre a mano.",
+    "description": "Haz preguntas en lenguaje natural, crea issues, actualiza assets y recupera documentos — todo desde una sola conversación. Sin cambiar de pestaña ni buscar en hojas de cálculo.",
+    "bullet1": "Consulta issues, assets y documentos por nombre o tag",
+    "bullet2": "Crea y actualiza registros con un solo mensaje",
+    "bullet3": "Lee nameplates y adjunta fotos al instante",
+    "bullet4": "Recupera documentos FAT y certificados al momento"
+  },
+  "aiFeature": {
+    "title": "IA que entiende el",
+    "titleHighlight": "commissioning.",
+    "description": "No solo almacenes datos — entiéndelos. Nuestro asistente integrado analiza la documentación del proyecto para responder consultas complejas, detectar inconsistencias y sugerir resoluciones basadas en el historial del proyecto.",
+    "feature1": "Análisis de tendencias y previsiones al instante",
+    "feature2": "Revisión técnica automatizada de resultados de pruebas",
+    "chatUser": "\"Resume los issues críticos abiertos del AHU-01 y dime quién es el responsable de la última actualización.\"",
+    "chatAssistant": "\"Hay 2 issues críticos para AHU-01: 1) Alerta de vibración en el ventilador, 2) Timeout de comunicación BMS. Ambos fueron actualizados por última vez por Sarah M. el martes.\"",
+    "inputPlaceholder": "Pregunta sobre tu proyecto..."
+  },
+  "featureShowcase": {
+    "eyebrow": "FUNCIONALIDADES",
+    "sectionTitle": "Diseñado para cada etapa del commissioning",
+    "sectionSubtitle": "Desde la primera entrega hasta el cierre final — una plataforma, sin interrupciones.",
+    "dashboard": {
+      "eyebrow": "ANALÍTICA",
+      "title": "Visibilidad de",
+      "titleHighlight": "centro de control",
+      "description": "Monitorea la salud de los assets, la velocidad de issues y el cumplimiento del cronograma en una sola vista. Detecta desviaciones antes de que se conviertan en retrasos.",
+      "bullet1": "Seguimiento Plan vs Real",
+      "bullet2": "Velocidad de issues por prioridad"
+    },
+    "assets": {
+      "eyebrow": "GESTIÓN DE ASSETS",
+      "title": "Cada asset,",
+      "titleHighlight": "bajo control",
+      "description": "Rastrea cada equipo con tags de commissioning codificados por color. Filtra, profundiza y accede a especificaciones técnicas y documentación vinculada para cualquier asset.",
+      "bullet1": "Flujo de tags por color (Red → White)",
+      "bullet2": "Datos técnicos y documentos vinculados por asset"
+    },
+    "issues": {
+      "eyebrow": "GESTIÓN DE ISSUES",
+      "title": "Issues resueltos,",
+      "titleHighlight": "nunca olvidados",
+      "description": "Una punch list poderosa y reinventada. Registra issues de campo desde foto o texto, asigna equipos, establece prioridades y mantén un historial completo con evidencia fotográfica.",
+      "bullet1": "Creación asistida por IA desde texto o foto",
+      "bullet2": "Historial completo con evidencia fotográfica"
+    },
+    "documentation": {
+      "eyebrow": "DOCUMENTACIÓN",
+      "title": "Todos tus docs,",
+      "titleHighlight": "siempre listos",
+      "description": "Carga, versiona y previsualiza informes FAT, scripts de prueba y certificados — todo en un lugar con visor PDF integrado y flujo de versiones.",
+      "bullet1": "Árbol de carpetas organizado con control de versiones",
+      "bullet2": "Visor PDF en el navegador — sin descargas"
+    },
+    "tracker": {
+      "eyebrow": "TRACKER DE DOCS",
+      "title": "Sabe qué falta",
+      "titleHighlight": "antes del cierre",
+      "description": "Mapea los documentos requeridos para cada asset y rastrea el progreso en las fases L1, L2, L3 y Handover. Aprueba, vincula o marca documentos directamente desde el tracker.",
+      "bullet1": "Vista de progreso por asset en todas las fases",
+      "bullet2": "Vincular, aprobar y marcar en un clic"
+    }
+  },
+  "blogPreview": {
+    "eyebrow": "Del Blog",
+    "title": "Insights de ingeniería",
+    "subtitle": "Análisis en profundidad sobre los retos del commissioning y cómo los estamos resolviendo.",
+    "viewAll": "Ver todos los artículos"
+  },
+  "pricing": {
+    "title": "Precios",
+    "subtitle": "Precios simples y transparentes para equipos de cualquier tamaño.",
+    "perMonth": "/ mes",
+    "selected": "Seleccionado",
+    "tiers": {
+      "basic": {
+        "title": "Basic",
+        "subtitle": "Para equipos pequeños",
+        "features": ["Issues", "Assets", "Gestor de documentación", "Tracker de documentación"],
+        "footer": ["Usuarios 5", "Almacenamiento 5 GB"],
+        "cta": "Empezar"
+      },
+      "pro": {
+        "title": "Pro",
+        "subtitle": "Ideal para equipos en crecimiento",
+        "features": [
+          "Issues & Assets",
+          "Gestor y tracker de documentación",
+          "Asistente IA (chat)",
+          "Documentación asistida por IA"
+        ],
+        "footer": ["Usuarios 20", "Almacenamiento 50 GB"],
+        "cta": "Comenzar ahora"
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "subtitle": "Plataforma de commissioning personalizada",
+        "features": [
+          "Todo lo de Pro",
+          "Módulos y dashboards personalizados",
+          "Flujos de trabajo específicos por proyecto",
+          "Onboarding adaptado"
+        ],
+        "footer": [],
+        "cta": "Contáctanos"
+      }
+    }
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "items": [
+      {
+        "question": "¿Qué es Cx Assistant?",
+        "answer": "Cx Assistant es una plataforma de commissioning de nueva generación para entornos complejos. Combina una potente aplicación de gestión con un asistente de IA para automatizar tareas, mejorar la colaboración y garantizar una entrega impecable del proyecto."
+      },
+      {
+        "question": "¿Cómo ayuda el asistente de IA a los ingenieros?",
+        "answer": "El asistente de IA automatiza tareas repetitivas, vincula issues a assets y proporciona respuestas inmediatas a preguntas en lenguaje natural. Ayuda a los ingenieros a dedicar menos tiempo a la administración y más tiempo a la ingeniería real."
+      },
+      {
+        "question": "¿Para qué tipo de proyectos está diseñado Cx Assistant?",
+        "answer": "Cx Assistant está diseñado para data centers, instalaciones industriales e infraestructuras críticas — cualquier entorno donde el commissioning sea complejo, de alto riesgo y con plazos ajustados."
+      },
+      {
+        "question": "¿Cómo apoya Cx Assistant el cumplimiento y la calidad?",
+        "answer": "Cx Assistant detecta firmas faltantes, campos incompletos e IDs que no coinciden, garantizando el cumplimiento antes del handover. La validación asistida por IA detecta errores antes de que se conviertan en riesgos."
+      }
+    ]
+  },
+  "seo": {
+    "homeTitle": "Cx Assistant — Plataforma de Commissioning con IA para Equipos de Ingeniería",
+    "homeDescription": "Cx Assistant es una plataforma de commissioning impulsada por IA que ayuda a los equipos de ingeniería a gestionar issues, assets y documentación — de forma más rápida, inteligente y consistente."
+  }
+}

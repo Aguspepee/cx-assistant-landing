@@ -1,0 +1,25 @@
+{
+  "seoTitle": "Contact | Cx Assistant",
+  "seoDescription": "Get in touch with the Cx Assistant team. We're here to help with questions about our AI-powered commissioning platform.",
+  "title": "Contact Us",
+  "subtitle": "Have a question, need support, or want to learn more about Cx Assistant? We'd love to hear from you.",
+  "cards": {
+    "email": {
+      "title": "Email Us",
+      "description": "For general enquiries, support, or partnership opportunities, drop us an email and we'll get back to you."
+    },
+    "linkedin": {
+      "title": "LinkedIn",
+      "description": "Follow us on LinkedIn for product updates, engineering insights, and commissioning best practices."
+    },
+    "responseTime": {
+      "title": "Response Time",
+      "description": "We typically respond within 1 business day. For urgent support matters, please mark your email subject with [Urgent]."
+    }
+  },
+  "cta": {
+    "title": "Ready to get started?",
+    "subtitle": "Join commissioning teams already using Cx Assistant.",
+    "button": "Get started"
+  }
+}

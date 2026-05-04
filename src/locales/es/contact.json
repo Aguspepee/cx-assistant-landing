@@ -1,0 +1,25 @@
+{
+  "seoTitle": "Contacto | Cx Assistant",
+  "seoDescription": "Contacta con el equipo de Cx Assistant. Estamos aquí para ayudarte con cualquier consulta sobre nuestra plataforma de commissioning impulsada por IA.",
+  "title": "Contáctanos",
+  "subtitle": "¿Tienes una pregunta, necesitas soporte o quieres saber más sobre Cx Assistant? Nos encantaría saber de ti.",
+  "cards": {
+    "email": {
+      "title": "Escríbenos",
+      "description": "Para consultas generales, soporte u oportunidades de colaboración, envíanos un email y te responderemos."
+    },
+    "linkedin": {
+      "title": "LinkedIn",
+      "description": "Síguenos en LinkedIn para novedades del producto, insights de ingeniería y buenas prácticas de commissioning."
+    },
+    "responseTime": {
+      "title": "Tiempo de respuesta",
+      "description": "Respondemos habitualmente en 1 día hábil. Para asuntos urgentes, incluye [Urgente] en el asunto del email."
+    }
+  },
+  "cta": {
+    "title": "¿Listo para empezar?",
+    "subtitle": "Únete a los equipos de commissioning que ya usan Cx Assistant.",
+    "button": "Comenzar"
+  }
+}

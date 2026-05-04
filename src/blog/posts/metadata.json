@@ -1,0 +1,24 @@
+[
+  {
+    "slug": "why-commissioning-teams-still-track-documentation-in-excel",
+    "title": "Why Commissioning Teams Still Track Documentation in Excel — And Why We Built Something Better",
+    "description": "Excel-based documentation trackers are still the norm in commissioning. Discover the real problems they create — broken links, unclear requirements, no asset connection — and how Cx Assistant was designed to solve them.",
+    "date": "2026-03-08",
+    "author": "Cx Assistant Team",
+    "category": "Product",
+    "tags": ["commissioning", "documentation", "asset-management", "data-center"],
+    "readTime": 6,
+    "ogImage": "/blog-images/commissioning-teams-tracker/cx-assistant-tracker-overview.png"
+  },
+  {
+    "slug": "plan-vs-actual-in-commissioning-why-its-harder-than-it-looks",
+    "title": "Plan vs Actual in Commissioning: Why It's Harder Than It Looks",
+    "description": "Plan vs Actual tracking is used in every commissioning project — but the process behind it is surprisingly complex. Learn what makes it hard, and how Cx Assistant simplifies it.",
+    "date": "2026-03-15",
+    "author": "Cx Assistant Team",
+    "category": "Product",
+    "tags": ["commissioning", "planning", "progress-tracking", "data-center"],
+    "readTime": 7,
+    "ogImage": "/blog-images/plan-vs-actual/plan-vs-actual-overview-1.png"
+  }
+]

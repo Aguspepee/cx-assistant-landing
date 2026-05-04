@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -9,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export default function FAQ() {
+  const { t } = useTranslation('home');
   const [expanded, setExpanded] = React.useState<string[]>([]);
 
   const handleChange =
@@ -20,7 +22,10 @@ export default function FAQ() {
       );
     };
 
+  const items = t('faq.items', { returnObjects: true }) as Array<{ question: string; answer: string }>;
+
   return (
+    <Box sx={{ backgroundColor: '#111314', width: '100%' }}>
     <Container
       id="faq"
       sx={{
@@ -35,109 +40,53 @@ export default function FAQ() {
     >
       <Typography
         component="h2"
-        variant="h4"
+        variant="h1"
         sx={{
-          color: 'text.primary',
+          color: '#ffffff',
           width: { sm: '100%', md: '60%' },
           textAlign: { sm: 'left', md: 'center' },
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontWeight: 700,
+          letterSpacing: 0.2,
         }}
       >
-  Frequently Asked Questions
+        {t('faq.title')}
       </Typography>
       <Box sx={{ width: '100%' }}>
-        <Accordion
-          expanded={expanded.includes('panel1')}
-          onChange={handleChange('panel1')}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1d-content"
-            id="panel1d-header"
-          >
-            <Typography component="span" variant="subtitle2">
-              What is Cx Assistant?
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography
-              variant="body2"
-              gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
+        {items.map((item, i) => {
+          const panel = `panel${i + 1}`;
+          return (
+            <Accordion
+              key={panel}
+              expanded={expanded.includes(panel)}
+              onChange={handleChange(panel)}
+              elevation={0}
+              sx={{ backgroundColor: '#1a1d1f', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px !important', mb: 1, '&:before': { display: 'none' } }}
             >
-              Cx Assistant is a next-generation commissioning platform for complex environments. It combines a powerful management app with an AI assistant to automate tasks, enhance collaboration, and ensure flawless project delivery.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion
-          expanded={expanded.includes('panel2')}
-          onChange={handleChange('panel2')}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel2d-content"
-            id="panel2d-header"
-          >
-            <Typography component="span" variant="subtitle2">
-              How does the AI assistant help engineers?
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography
-              variant="body2"
-              gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
-            >
-              The AI assistant automates repetitive tasks, links issues to assets, and provides instant answers to natural language questions. It helps engineers spend less time on admin and more time on actual engineering.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion
-          expanded={expanded.includes('panel3')}
-          onChange={handleChange('panel3')}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel3d-content"
-            id="panel3d-header"
-          >
-            <Typography component="span" variant="subtitle2">
-              What types of projects is Cx Assistant built for?
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography
-              variant="body2"
-              gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
-            >
-              Cx Assistant is designed for data centers, industrial facilities, and critical infrastructure—anywhere commissioning is complex, high-stakes, and time-critical.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion
-          expanded={expanded.includes('panel4')}
-          onChange={handleChange('panel4')}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel4d-content"
-            id="panel4d-header"
-          >
-            <Typography component="span" variant="subtitle2">
-              How does Cx Assistant support compliance and quality?
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography
-              variant="body2"
-              gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
-            >
-              Cx Assistant highlights missing signatures, incomplete fields, and mismatched IDs, ensuring compliance before handover. AI-powered validation catches errors before they become risks.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon sx={{ color: 'rgba(255,255,255,0.6)' }} />}
+                aria-controls={`${panel}d-content`}
+                id={`${panel}d-header`}
+                sx={{ '&:hover': { backgroundColor: 'rgba(255,255,255,0.05)' } }}
+              >
+                <Typography component="span" variant="subtitle2" sx={{ fontFamily: "'Roboto', sans-serif", fontWeight: 600, color: '#ffffff' }}>
+                  {item.question}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography
+                  variant="body2"
+                  gutterBottom
+                  sx={{ maxWidth: { sm: '100%', md: '70%' }, fontFamily: "'Roboto', sans-serif", lineHeight: 1.7, color: 'rgba(255,255,255,0.55)' }}
+                >
+                  {item.answer}
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          );
+        })}
       </Box>
     </Container>
+    </Box>
   );
 }

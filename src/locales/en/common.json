@@ -1,0 +1,60 @@
+{
+  "nav": {
+    "highlights": "Highlights",
+    "features": "Features",
+    "faq": "FAQ",
+    "blog": "Blog",
+    "signIn": "Sign in",
+    "signUp": "Sign up"
+  },
+  "langSwitcher": {
+    "label": "Language"
+  },
+  "footer": {
+    "newsletter": {
+      "title": "Join the newsletter",
+      "subtitle": "Subscribe for weekly updates. No spams ever!",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Your email address",
+      "subscribe": "Subscribe"
+    },
+    "product": {
+      "title": "Product",
+      "features": "Features",
+      "highlights": "Highlights",
+      "faqs": "FAQs"
+    },
+    "company": {
+      "title": "Company",
+      "about": "About us",
+      "careers": "Careers",
+      "press": "Press"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "contact": "Contact"
+    },
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "copyright": "Copyright"
+  },
+  "actions": {
+    "readMore": "Read more",
+    "viewAllPosts": "View all posts",
+    "getStarted": "Get Started →",
+    "seeAllFeatures": "See all features",
+    "startForFree": "Start for free",
+    "contactUs": "Contact us",
+    "allPosts": "All posts",
+    "share": "Share",
+    "sharePost": "Share this post",
+    "shareLinkedIn": "Share on LinkedIn",
+    "copyLink": "Copy link",
+    "copied": "Copied!"
+  },
+  "meta": {
+    "minRead": "min read"
+  }
+}

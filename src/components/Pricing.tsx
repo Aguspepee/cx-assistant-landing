@@ -1,5 +1,8 @@
 import * as React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { useLangPath } from '../i18n/useLang';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -12,60 +15,61 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
-
-const tiers = [
-  {
-    title: 'Free',
-    price: '0',
-    description: [
-      '10 users included',
-      '2 GB of storage',
-      'Help center access',
-      'Email support',
-    ],
-    buttonText: 'Sign up for free',
-    buttonVariant: 'outlined',
-    buttonColor: 'primary',
-  },
-  {
-    title: 'Professional',
-    subheader: 'Recommended',
-    price: '15',
-    description: [
-      '20 users included',
-      '10 GB of storage',
-      'Help center access',
-      'Priority email support',
-      'Dedicated team',
-      'Best deals',
-    ],
-    buttonText: 'Start now',
-    buttonVariant: 'contained',
-    buttonColor: 'secondary',
-  },
-  {
-    title: 'Enterprise',
-    price: '30',
-    description: [
-      '50 users included',
-      '30 GB of storage',
-      'Help center access',
-      'Phone & email support',
-    ],
-    buttonText: 'Contact us',
-    buttonVariant: 'outlined',
-    buttonColor: 'primary',
-  },
-];
+import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
+import StorageRoundedIcon from '@mui/icons-material/StorageRounded';
+import { brand } from '../theme/themePrimitives';
 
 export default function Pricing() {
-  return (
-    <motion.div
+  const { t } = useTranslation('home');
+  const lp = useLangPath();
+
+  const tiers = [
+    {
+      key: 'basic',
+      title: t('pricing.tiers.basic.title'),
+      price: '150',
+      subtitle: t('pricing.tiers.basic.subtitle'),
+      description: t('pricing.tiers.basic.features', { returnObjects: true }) as string[],
+      footerItems: t('pricing.tiers.basic.footer', { returnObjects: true }) as string[],
+      buttonText: t('pricing.tiers.basic.cta'),
+      buttonVariant: 'outlined',
+      buttonColor: 'primary',
+      href: 'https://app.cx-assistant.com/sign-up',
+    },
+    {
+      key: 'pro',
+      title: t('pricing.tiers.pro.title'),
+      subheader: t('pricing.selected'),
+      price: '500',
+      subtitle: t('pricing.tiers.pro.subtitle'),
+      description: t('pricing.tiers.pro.features', { returnObjects: true }) as string[],
+      footerItems: t('pricing.tiers.pro.footer', { returnObjects: true }) as string[],
+      buttonText: t('pricing.tiers.pro.cta'),
+      buttonVariant: 'contained',
+      buttonColor: 'secondary',
+      href: 'https://app.cx-assistant.com/sign-up',
+    },
+    {
+      key: 'enterprise',
+      title: t('pricing.tiers.enterprise.title'),
+      price: null,
+      subtitle: t('pricing.tiers.enterprise.subtitle'),
+      description: t('pricing.tiers.enterprise.features', { returnObjects: true }) as string[],
+      footerItems: [] as string[],
+      buttonText: t('pricing.tiers.enterprise.cta'),
+      buttonVariant: 'outlined',
+      buttonColor: 'primary',
+      contactRoute: true,
+    },
+  ];
+
+  return (    <motion.div
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
     >
+      <Box sx={{ backgroundColor: 'grey.100', width: '100%' }}>
       <Container
         id="pricing"
         sx={{
@@ -86,135 +90,157 @@ export default function Pricing() {
         >
           <Typography
             component="h2"
-            variant="h4"
+            variant="h1"
             gutterBottom
-            sx={{ color: 'text.primary' }}
+            sx={{ color: 'text.primary', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, letterSpacing: 0.2 }}
           >
-            Pricing
+          {t('pricing.title')}
           </Typography>
-          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-            Quickly build an effective pricing table for your potential customers with
-            this layout. <br />
-            It&apos;s built with default Material UI components with little
-            customization.
+          <Typography variant="body1" sx={{ color: 'text.secondary', fontFamily: "'Roboto', sans-serif", fontSize: '1rem' }}>
+            {t('pricing.subtitle')}
           </Typography>
         </Box>
         <Grid
           container
-          spacing={3}
-          sx={{ alignItems: 'center', justifyContent: 'center', width: '100%' }}
+          spacing={1}
+          sx={{ alignItems: 'stretch', justifyContent: 'center', width: '100%' }}
         >
-          {tiers.map((tier) => (
+              {tiers.map((tier) => (
             <Grid
-              size={{ xs: 12, sm: tier.title === 'Enterprise' ? 12 : 6, md: 4 }}
-              key={tier.title}
+              size={{ xs: 12, sm: 6, md: 4 }}
+              key={tier.key}
+              sx={{ transform: tier.title !== 'Pro' ? 'scale(0.88)' : 'none', transition: 'transform 0.25s ease' }}
             >
               <Card
-                sx={[
-                  {
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 4,
+                elevation={0}
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 4,
+                  height: '100%',
+                  borderRadius: 2,
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  backgroundColor: '#ffffff',
+                  boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
+                  transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+                  '&:hover': {
+                    transform: 'scale(1.04)',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
                   },
-                  tier.title === 'Professional' &&
-                    ((theme) => ({
-                      border: 'none',
-                      background:
-                        'radial-gradient(circle at 50% 0%, hsl(220, 20%, 35%), hsl(220, 30%, 6%))',
-                      boxShadow: `0 8px 12px hsla(220, 20%, 42%, 0.2)`,
-                      ...theme.applyStyles('dark', {
-                        background:
-                          'radial-gradient(circle at 50% 0%, hsl(220, 20%, 20%), hsl(220, 30%, 16%))',
-                        boxShadow: `0 8px 12px hsla(0, 0%, 0%, 0.8)`,
-                      }),
-                    })),
-                ]}
+                  ...(tier.title === 'Pro' && {
+                    outline: '3px solid',
+                    outlineColor: 'rgba(0, 0, 0, 0.12)',
+                  }),
+                }}
               >
-                <CardContent>
+                <CardContent sx={{ flexGrow: 1 }}>
                   <Box
-                    sx={[
-                      {
-                        mb: 1,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        gap: 2,
-                      },
-                      tier.title === 'Professional'
-                        ? { color: 'grey.100' }
-                        : { color: '' },
-                    ]}
+                    sx={{
+                      mb: 1,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: 2,
+                    }}
                   >
                     <Typography component="h3" variant="h6">
                       {tier.title}
                     </Typography>
-                    {tier.title === 'Professional' && (
-                      <Chip icon={<AutoAwesomeIcon />} label={tier.subheader} />
+                    {tier.key === 'pro' && (
+                      <Chip
+                        icon={<AutoAwesomeIcon />}
+                        label={tier.subheader}
+                        sx={{
+                          backgroundColor: 'grey.200',
+                          color: 'grey.700',
+                        }}
+                      />
                     )}
                   </Box>
-                  <Box
-                    sx={[
-                      {
-                        display: 'flex',
-                        alignItems: 'baseline',
-                      },
-                      tier.title === 'Professional'
-                        ? { color: 'grey.50' }
-                        : { color: null },
-                    ]}
-                  >
-                    <Typography component="h3" variant="h2">
-                      ${tier.price}
+                  {tier.price !== null ? (
+                    <>
+                      <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
+                        <Typography component="h3" variant="h2">
+                          €{tier.price}
+                        </Typography>
+                        <Typography component="h3" variant="h6">
+                          &nbsp; {t('pricing.perMonth')}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" sx={{ mt: 0.5, color: 'text.secondary' }}>
+                        {tier.subtitle}
+                      </Typography>
+                    </>
+                  ) : (
+                    <Typography
+                      component="h3"
+                      variant="h6"
+                      sx={{ fontWeight: 'bold', color: 'text.primary' }}
+                    >
+                      {tier.subtitle}
                     </Typography>
-                    <Typography component="h3" variant="h6">
-                      &nbsp; per month
-                    </Typography>
-                  </Box>
+                  )}
                   <Divider sx={{ my: 2, opacity: 0.8, borderColor: 'divider' }} />
                   {tier.description.map((line) => (
                     <Box
                       key={line}
                       sx={{ py: 1, display: 'flex', gap: 1.5, alignItems: 'center' }}
                     >
-                      <CheckCircleRoundedIcon
-                        sx={[
-                          {
-                            width: 20,
-                          },
-                          tier.title === 'Professional'
-                            ? { color: 'primary.light' }
-                            : { color: 'primary.main' },
-                        ]}
-                      />
-                      <Typography
-                        variant="subtitle2"
-                        component={'span'}
-                        sx={[
-                          tier.title === 'Professional'
-                            ? { color: 'grey.50' }
-                            : { color: null },
-                        ]}
-                      >
+                      <CheckCircleRoundedIcon sx={{ width: 20, color: brand[600] }} />
+                      <Typography variant="subtitle2" component={'span'}>
                         {line}
                       </Typography>
                     </Box>
                   ))}
+                  {tier.footerItems.length > 0 && (
+                    <>
+                      <Divider sx={{ my: 2, opacity: 0.8, borderColor: 'divider' }} />
+                      <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', mb: 1 }}>
+                        <GroupRoundedIcon sx={{ width: 20, color: 'text.secondary' }} />
+                        <Typography variant="subtitle2" component={'span'} sx={{ color: 'text.secondary' }}>
+                          {tier.footerItems[0]}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                        <StorageRoundedIcon sx={{ width: 20, color: 'text.secondary' }} />
+                        <Typography variant="subtitle2" component={'span'} sx={{ color: 'text.secondary' }}>
+                          {tier.footerItems[1]}
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
                 </CardContent>
                 <CardActions>
-                  <Button
-                    fullWidth
-                    variant={tier.buttonVariant as 'outlined' | 'contained'}
-                    color={tier.buttonColor as 'primary' | 'secondary'}
-                  >
-                    {tier.buttonText}
-                  </Button>
+                  {(tier as any).contactRoute ? (
+                    <Button
+                      fullWidth
+                      variant={tier.buttonVariant as 'outlined' | 'contained'}
+                      color={tier.buttonColor as 'primary' | 'secondary'}
+                      component={RouterLink}
+                      to={lp('/contact')}
+                    >
+                      {tier.buttonText}
+                    </Button>
+                  ) : (
+                    <Button
+                      fullWidth
+                      variant={tier.buttonVariant as 'outlined' | 'contained'}
+                      color={tier.buttonColor as 'primary' | 'secondary'}
+                      href={(tier as any).href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {tier.buttonText}
+                    </Button>
+                  )}
                 </CardActions>
               </Card>
             </Grid>
           ))}
         </Grid>
       </Container>
+      </Box>
     </motion.div>
   );
 }

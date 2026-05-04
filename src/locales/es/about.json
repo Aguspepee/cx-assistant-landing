@@ -1,0 +1,28 @@
+{
+  "seoTitle": "Sobre Nosotros | Cx Assistant",
+  "seoDescription": "Conoce al equipo detrás de Cx Assistant — una plataforma de commissioning impulsada por IA, creada por ingenieros para ingenieros.",
+  "title": "Sobre Nosotros",
+  "subtitle": "Somos ingenieros que nos cansamos de gestionar proyectos de commissioning con hojas de cálculo.",
+  "mission": {
+    "label": "Nuestra misión",
+    "text": "Cx Assistant existe para devolverle el tiempo a los equipos de commissioning. Construimos la plataforma que hubiéramos querido tener — una que registra incidencias, hace seguimiento del progreso y responde preguntas al instante, para que los equipos puedan centrarse en ingeniería real en lugar de actualizaciones de estado."
+  },
+  "story": {
+    "label": "Cómo comenzó",
+    "text": "Tras años trabajando en proyectos industriales de commissioning complejos, experimentamos de primera mano cuánto tiempo se pierde buscando información, persiguiendo actualizaciones y manteniendo trackers. Empezamos a construir Cx Assistant para cambiar eso — combinando datos de proyecto estructurados con IA para que cada respuesta esté a un mensaje de distancia."
+  },
+  "values": {
+    "label": "En qué creemos",
+    "items": [
+      { "title": "Construido para el campo", "description": "Cada funcionalidad está diseñada en torno a cómo trabajan realmente los equipos de commissioning — dinámicos, de alto impacto y con alto nivel de detalle." },
+      { "title": "Claridad sobre complejidad", "description": "Eliminamos el ruido. Nuestra plataforma es tan sencilla que los nuevos miembros del equipo son productivos desde el primer día." },
+      { "title": "Datos en los que confiar", "description": "Cx Assistant te da visibilidad en tiempo real del estado del proyecto, respaldada por los datos que tu equipo introduce cada día." }
+    ]
+  },
+  "cta": {
+    "title": "¿Listo para verlo en acción?",
+    "subtitle": "Empieza tu prueba gratuita o contáctanos — nos encantaría mostrarte cómo funciona.",
+    "signUp": "Empieza gratis",
+    "contact": "Contáctanos"
+  }
+}

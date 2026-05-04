@@ -1,730 +1,1083 @@
 import * as React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { keyframes } from '@emotion/react';
+import { useTranslation } from 'react-i18next';
+import { useLangPath } from '../i18n/useLang';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
- 
+import Chip from '@mui/material/Chip';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import SendIcon from '@mui/icons-material/Send';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
 
-import IconButton from '@mui/material/IconButton';
-import { useTheme, useColorScheme } from '@mui/material/styles';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import * as THREE from 'three';
-import { createNoise3D } from 'simplex-noise';
+// ─── Keyframes ────────────────────────────────────────────────────────────────
 
-// Gradient, matte sphere with soft glow (React + Three.js)
-function GradientSphere() {
-  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const animationRef = React.useRef<number | null>(null);
-  const mountedRef = React.useRef(false);
+const floatCard = keyframes`
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-8px); }
+`;
 
-  React.useEffect(() => {
-    const container = containerRef.current!;
-    const canvas = canvasRef.current!;
-    if (!container || !canvas) return;
+const orbDrift1 = keyframes`
+  0%,100% { transform: translate(0%,0%) scale(1);       }
+  40%      { transform: translate(20%,-16%) scale(1.16); }
+  72%      { transform: translate(-10%,14%) scale(0.88); }
+`;
 
-    // Respect reduced motion
-    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const orbDrift2 = keyframes`
+  0%,100% { transform: translate(0%,0%) scale(1);       }
+  45%      { transform: translate(-15%,12%) scale(1.12); }
+  70%      { transform: translate(12%,-8%) scale(0.92);  }
+`;
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: true,
-      powerPreference: 'high-performance',
-    });
-    renderer.setClearColor(0x000000, 0); // transparent to blend with hero
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15; // a touch more punch
+const shimmerSweep = keyframes`
+  0%   { background-position: -220% center; }
+  65%  { background-position: 220% center; }
+  100% { background-position: 220% center; }
+`;
 
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x000000, 10, 950);
+// ─── Hero Chat Simulation ───────────────────────────────────────────────────
 
-    const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 10000);
-    camera.position.set(0, 0, 300);
+type RichComponent = 'nameplate-result' | 'bar-chart' | 'issue-form' | 'pdf-preview';
 
-    const setSize = () => {
-      const { clientWidth: w, clientHeight: h } = container;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / Math.max(1, h);
-      camera.updateProjectionMatrix();
-    };
-    setSize();
+interface ChatTurn {
+  userText: string;
+  userAttachment?: { name: string; imgSrc?: string };
+  assistantText: string;
+  assistantComponent?: RichComponent;
+  thinkingLabel?: string;
+}
 
-    // Lights
-    const hemi = new THREE.HemisphereLight(0xffffff, 0x111111, 0.35);
-    const key = new THREE.DirectionalLight(0xffffff, 0.32);
-    key.position.set(0, 450, 350);
-    key.castShadow = true;
-    key.shadow.camera.left = -650;
-    key.shadow.camera.right = 650;
-    key.shadow.camera.top = 650;
-    key.shadow.camera.bottom = -650;
-    key.shadow.camera.near = 1;
-    key.shadow.camera.far = 1000;
-    key.shadow.mapSize.width = 1024;
-    key.shadow.mapSize.height = 1024;
-    const fill = new THREE.DirectionalLight(0xffffff, 0.18);
-    fill.position.set(-600, 350, 350);
-    const rim = new THREE.DirectionalLight(0xffffff, 0.12);
-    rim.position.set(0, -250, 300);
-    scene.add(hemi, key, fill, rim);
+// Supplementary non-translatable data (attachments + rich components) indexed by turn position
+const CHAT_TURN_SUPPLEMENTS: Pick<ChatTurn, 'userAttachment' | 'assistantComponent'>[] = [
+  {},
+  {},
+  {},
+  {},
+  { userAttachment: { name: 'nameplate.jpg', imgSrc: '/images/nameplate.jpg' }, assistantComponent: 'nameplate-result' },
+  { assistantComponent: 'bar-chart' },
+  { assistantComponent: 'issue-form' },
+  { assistantComponent: 'pdf-preview' },
+];
 
-    // Helpers to build textures
-    function makeVerticalGradientTexture(stops: Array<{ offset: number; color: string }>, size = 512) {
-      const c = document.createElement('canvas');
-      c.width = 1; c.height = size;
-      const ctx = c.getContext('2d')!;
-      const g = ctx.createLinearGradient(0, 0, 0, size);
-      stops.forEach((s) => g.addColorStop(s.offset, s.color));
-      ctx.fillStyle = g; ctx.fillRect(0, 0, 1, size);
-      const tex = new THREE.CanvasTexture(c);
-      tex.wrapS = THREE.RepeatWrapping;
-      tex.wrapT = THREE.ClampToEdgeWrapping;
-      tex.needsUpdate = true;
-      return tex;
-    }
-    function makeRadialGlowTexture(size = 512, rgb = '255,255,255') {
-      const c = document.createElement('canvas');
-      c.width = c.height = size;
-      const ctx = c.getContext('2d')!;
-      const cx = size / 2; const cy = size / 2; const r = size / 2;
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      grad.addColorStop(0.0, `rgba(${rgb}, 0.90)`);
-      grad.addColorStop(0.4, `rgba(${rgb}, 0.35)`);
-      grad.addColorStop(1.0, `rgba(${rgb}, 0.00)`);
-      ctx.clearRect(0, 0, size, size);
-      ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-      const tex = new THREE.CanvasTexture(c);
-      tex.needsUpdate = true;
-      return tex;
-    }
+// ── Rich component renderers ────────────────────────────────────────────────
 
-    // Sphere geometry/material
-    const segments = container.clientWidth > 575 ? 96 : 64;
-  const radius = 70; // 30% smaller
-    const geometry = new THREE.SphereGeometry(radius, segments, segments);
-
-    // Store original positions for noise deformation
-    const position = geometry.getAttribute('position') as THREE.BufferAttribute;
-    const original = new Float32Array(position.array.length);
-    original.set(position.array as ArrayLike<number>);
-
-    const BRAND_GRADIENT = [
-      { offset: 0.00, color: '#59D8FF' }, // a touch richer cyan
-      { offset: 0.55, color: '#6A4CFF' }, // deeper indigo
-      { offset: 1.00, color: '#FF47C5' }, // hotter pink
-    ];
-    const gradientTex = makeVerticalGradientTexture(BRAND_GRADIENT);
-    gradientTex.colorSpace = THREE.SRGBColorSpace;   // IMPORTANT: don’t skip
-    gradientTex.needsUpdate = true;
-
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      map: gradientTex,
-      emissive: new THREE.Color(0xffffff),
-      emissiveMap: gradientTex,
-      emissiveIntensity: 0.1, // brighter colors
-      roughness: 0.4,         // matte premium
-      metalness: 0.04,
-      side: THREE.FrontSide,
-      dithering: true,
-    });
-
-    const bubble = new THREE.Mesh(geometry, material);
-    bubble.castShadow = true;
-    bubble.receiveShadow = false;
-    scene.add(bubble);
-
-    // Soft aura sprite (tighter & slightly brighter)
-    const glowTex = makeRadialGlowTexture(512, '255,255,255');
-    const glowMat = new THREE.SpriteMaterial({
-      map: glowTex,
-      color: 0xffffff,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      transparent: true,
-      opacity: 0.02,
-    });
-    const glowSprite = new THREE.Sprite(glowMat);
-  const glowScale = 238; // scaled with sphere (30% smaller)
-    glowSprite.scale.set(glowScale, glowScale, 1);
-    glowSprite.position.set(0, 0, 0);
-    scene.add(glowSprite);
-
-    // Shadow receiver (subtle grounding)
-    const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(2000, 2000),
-      new THREE.ShadowMaterial({ opacity: 0.06 }),
-    );
-    plane.position.set(0, -135, 0); // slightly closer with smaller sphere
-    plane.rotation.x = -Math.PI / 2;
-    plane.receiveShadow = true;
-    scene.add(plane);
-
-    // Interaction state
-    const noise3D = createNoise3D();
-    const mouse = new THREE.Vector2();
-    const center = new THREE.Vector2();
-    const scale = { current: 1, target: 1 };
-
-    const map = (num: number, inMin: number, inMax: number, outMin: number, outMax: number) =>
-      (num - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
-
-    const updateMouse = (e: PointerEvent | MouseEvent | TouchEvent) => {
-      let x = 0, y = 0;
-      if (e instanceof TouchEvent) {
-        const t = e.touches[0] || e.changedTouches[0];
-        x = t?.clientX ?? 0; y = t?.clientY ?? 0;
-      } else if ('clientX' in e) {
-        x = (e as MouseEvent).clientX; y = (e as MouseEvent).clientY;
-      }
-      const rect = container.getBoundingClientRect();
-      mouse.set(x - rect.left, y - rect.top);
-    };
-
-    const onPointerDown = () => { scale.target = 0.7; };
-    const onPointerUp = () => { scale.target = 1.0; };
-
-    container.addEventListener('mousemove', updateMouse);
-    container.addEventListener('touchmove', updateMouse, { passive: true });
-    container.addEventListener('pointerdown', onPointerDown);
-    window.addEventListener('pointerup', onPointerUp);
-
-    // Resize handling
-    const resizeObserver = new ResizeObserver(() => setSize());
-    resizeObserver.observe(container);
-
-    // Pause animation when tab not visible
-    const onVis = () => {
-      if (document.hidden) {
-        if (animationRef.current) cancelAnimationFrame(animationRef.current);
-        animationRef.current = null;
-      } else if (!animationRef.current && !prefersReduced) {
-        animationRef.current = requestAnimationFrame(animate);
-      }
-    };
-    document.addEventListener('visibilitychange', onVis);
-
-    mountedRef.current = true;
-
-    const animate = (t: number) => {
-      // Lerp scale
-      scale.current += (scale.target - scale.current) * 0.08;
-      bubble.scale.setScalar(scale.current);
-
-      // Rotate relative to mouse position
-      center.set(container.clientWidth / 2, container.clientHeight / 2);
-      const rotY = map(mouse.x, 0, container.clientWidth, -2.0, 2.0);
-      const rotZ = map(mouse.y, 0, container.clientHeight, 2.0, -2.0);
-      bubble.rotation.y = rotY;
-      bubble.rotation.z = rotZ;
-
-      // Noise deformation (smoother to avoid pixelly edges)
-      const time = t * 0.0005;
-      const maxDist = Math.hypot(center.x, center.y);
-      const d = Math.hypot(mouse.x - center.x, mouse.y - center.y);
-      const distRatio = map(d, 0, Math.max(1, maxDist), 1, 0);
-
-      const arr = position.array as Float32Array;
-      for (let i = 0; i < arr.length; i += 3) {
-        const ox = original[i];
-        const oy = original[i + 1];
-        const oz = original[i + 2];
-        const n = noise3D(ox * 0.005 + time, oy * 0.005 + time, oz * 0.005);
-        const ratio = (n * 0.26 * (distRatio + 0.1)) + 0.82;
-        arr[i] = ox * ratio;
-        arr[i + 1] = oy * ratio;
-        arr[i + 2] = oz * ratio;
-      }
-      position.needsUpdate = true;
-      geometry.computeVertexNormals();
-
-      glowSprite.lookAt(camera.position);
-
-      renderer.render(scene, camera);
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    if (!prefersReduced) {
-      animationRef.current = requestAnimationFrame(animate);
-    } else {
-      renderer.render(scene, camera);
-    }
-
-    return () => {
-      mountedRef.current = false;
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      resizeObserver.disconnect();
-      container.removeEventListener('mousemove', updateMouse);
-      container.removeEventListener('touchmove', updateMouse);
-      container.removeEventListener('pointerdown', onPointerDown);
-      window.removeEventListener('pointerup', onPointerUp);
-      document.removeEventListener('visibilitychange', onVis);
-
-      // Dispose resources
-      geometry.dispose();
-      material.dispose();
-      gradientTex.dispose();
-      glowTex.dispose();
-      glowMat.dispose();
-      plane.geometry.dispose();
-      (plane.material as THREE.Material).dispose();
-      renderer.dispose();
-    };
-  }, []);
-
+function NameplateResult() {
+  const { t } = useTranslation('home');
+  const fields = [
+    { label: t('hero.nameplate.voltage'), old: '208VAC', val: '"208VAC"', conf: 95 },
+    { label: t('hero.nameplate.serialNo'), old: '06-7M71593-01', val: '"06-7M71593-01"', conf: 95 },
+    { label: t('hero.nameplate.power'), old: '50.2kVA', val: '"50.2kVA"', conf: 95 },
+  ];
   return (
-    <Box
-      ref={containerRef}
-      sx={{
-        position: 'relative',
-        width: '100%',
-        height: { xs: 320, sm: 420, md: 520 },
-        borderRadius: 2,
-        overflow: 'hidden',
-        backdropFilter: 'none', // ensure no haze behind canvas
-      }}
-    >
-      <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
+    <Box sx={{ mt: 0.8, borderRadius: 2, bgcolor: '#12151a', border: '1px solid rgba(255,255,255,0.1)', p: 1.5, fontSize: '0.7rem' }}>
+      <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 700, fontSize: '0.72rem', mb: 0.8 }}>{t('hero.nameplate.applied')}</Typography>
+      {fields.map((f) => (
+        <Box key={f.label} sx={{ display: 'flex', alignItems: 'center', gap: 0.6, mb: 0.4 }}>
+          <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 700, fontSize: '0.68rem', minWidth: 60 }}>{f.label}</Typography>
+          <Typography sx={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.62rem', textDecoration: 'line-through' }}>{f.old}</Typography>
+          <Typography sx={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.62rem' }}>←</Typography>
+          <Typography sx={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.68rem' }}>{f.val}</Typography>
+          <Box sx={{ ml: 'auto', bgcolor: 'rgba(255,255,255,0.08)', borderRadius: 0.8, px: 0.6, py: 0.1 }}>
+            <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.6rem' }}>{f.conf}%</Typography>
+          </Box>
+        </Box>
+      ))}
     </Box>
   );
 }
 
-export default function Hero() {
-  const keyframes = `
-    @keyframes shimmer { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
-    @keyframes gridScroll { 0% { background-position: 0 0, 0 0; } 100% { background-position: 48px 48px, 48px 48px; } }
-    @keyframes sweep { 0% { transform: translateX(-120%); opacity: 0; } 20% { opacity:.25; } 50% { opacity:.35; } 100% { transform: translateX(120%); opacity:0; } }
-    @keyframes glowPulse { 0%,100% { box-shadow: 0 0 24px 6px rgba(80,140,255,0.12);} 50% { box-shadow:0 0 36px 12px rgba(80,140,255,0.18);} }
-    @keyframes caretBlink { 0%,49% { opacity:1; } 50%,100% { opacity:0; } }
-    @keyframes dotPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
-    @media (prefers-reduced-motion: reduce) {
-      * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
-    }
-  `;
-
-  // ---- Typewriter (cycle phrases) ----
-  const phrases = [
-    'Empowering Commissioning',
-    'AI Built for Engineers',
-    'Resolve Issues Faster',
-    'Plan with Ease',
+function MiniBarChart() {
+  const { t } = useTranslation('home');
+  const bars = [
+    { label: 'medium', open: 7, closed: 1, color: '#4da6ff' },
+    { label: 'low',    open: 1, closed: 0, color: '#4da6ff' },
+    { label: 'high',   open: 0, closed: 0, color: '#4da6ff' },
   ];
+  const maxVal = 8;
+  return (
+    <Box sx={{ mt: 0.8, borderRadius: 2, bgcolor: '#161b22', border: '1px solid rgba(77,166,255,0.18)', p: 1.5 }}>
+      <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 700, fontSize: '0.72rem' }}>{t('hero.barChart.title')}</Typography>
+      <Typography sx={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.62rem', mb: 1 }}>{t('hero.barChart.subtitle')}</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1.5, height: 60, px: 0.5 }}>
+        {bars.map((b) => (
+          <Box key={b.label} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: 48 }}>
+              <Box
+                sx={{
+                  width: '100%',
+                  height: `${((b.open + b.closed) / maxVal) * 48}px`,
+                  bgcolor: b.color,
+                  borderRadius: '3px 3px 0 0',
+                  opacity: b.open + b.closed === 0 ? 0.15 : 1,
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                {b.closed > 0 && (
+                  <Box sx={{ position: 'absolute', bottom: 0, width: '100%', height: `${(b.closed / (b.open + b.closed)) * 100}%`, bgcolor: 'rgba(77,166,255,0.35)' }} />
+                )}
+              </Box>
+            </Box>
+            <Typography sx={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.6rem', mt: 0.4 }}>{b.label}</Typography>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
+}
 
-  type Phase = 'typing' | 'pausing' | 'deleting';
-  const [phase, setPhase] = React.useState<Phase>('typing');
-  const [index, setIndex] = React.useState(0);
-  const [typed, setTyped] = React.useState('');
+function IssueForm() {
+  const { t } = useTranslation('home');
+  return (
+    <Box sx={{ mt: 0.8, borderRadius: 2, bgcolor: '#12151a', border: '1px solid rgba(255,255,255,0.1)', p: 1.5 }}>
+      <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', mb: 0.8 }}>{t('hero.issueForm.editing')}</Typography>
+      {[
+        { label: t('hero.issueForm.titleLabel'), value: 'TX45 temperature sensor broken' },
+        { label: t('hero.issueForm.descriptionLabel'), value: 'Broken temperature sensor on TX45. Please replace and verify.' },
+        { label: t('hero.issueForm.assignedToLabel'), value: t('hero.issueForm.unassigned'), italic: true },
+      ].map((f) => (
+        <Box key={f.label} sx={{ mb: 0.7 }}>
+          <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 700, fontSize: '0.67rem' }}>{f.label}</Typography>
+          <Typography sx={{ color: f.italic ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.65)', fontSize: '0.67rem', fontStyle: f.italic ? 'italic' : 'normal', mt: 0.1 }}>
+            {f.value}
+          </Typography>
+        </Box>
+      ))}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.4 }}>
+        <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 700, fontSize: '0.67rem' }}>{t('hero.issueForm.statusLabel')}</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#4da6ff' }} />
+          <Typography sx={{ color: '#4da6ff', fontSize: '0.67rem' }}>{t('hero.issueForm.open')}</Typography>
+        </Box>
+      </Box>
+      <Box sx={{ display: 'flex', gap: 0.5, mt: 1, flexWrap: 'wrap' }}>
+        {[t('hero.issueForm.assignAction'), t('hero.issueForm.closeAction')].map((a) => (
+          <Box key={a} sx={{ border: '1px solid rgba(255,255,255,0.2)', borderRadius: 20, px: 1, py: 0.3, cursor: 'default' }}>
+            <Typography sx={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.6rem' }}>{a}</Typography>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
+}
+
+function PdfPreview() {
+  return (
+    <Box sx={{ mt: 0.8, borderRadius: 2, bgcolor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+      {/* Toolbar */}
+      <Box sx={{ bgcolor: '#2a2a2a', px: 1.5, py: 0.7, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+        {['⬇', '🖨', '⋮'].map((icon) => (
+          <Typography key={icon} sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', cursor: 'default' }}>{icon}</Typography>
+        ))}
+      </Box>
+      {/* Fake document body */}
+      <Box sx={{ bgcolor: '#fff', p: 1.5, mx: 1, my: 0.8, borderRadius: 1 }}>
+        <Typography sx={{ color: '#222', fontSize: '0.58rem', fontWeight: 700, mb: 0.3 }}>INFORME DE ENSAYO</Typography>
+        <Typography sx={{ color: '#555', fontSize: '0.55rem', mb: 0.2 }}>Equipo: FARADAY - T-AU-4-00001</Typography>
+        <Typography sx={{ color: '#555', fontSize: '0.55rem', mb: 0.2 }}>Componente: RBC</Typography>
+        <Box sx={{ mt: 0.6, border: '1px solid #e0e0e0', borderRadius: 0.5, p: 0.6, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Typography sx={{ color: '#333', fontSize: '0.55rem', fontWeight: 700 }}>CÓDIGO DE ESTADO GENERAL:</Typography>
+          <Box sx={{ bgcolor: '#fff3cd', borderRadius: 0.4, px: 0.5 }}>
+            <Typography sx={{ color: '#856404', fontSize: '0.52rem', fontWeight: 700 }}>REGULAR ⚠</Typography>
+          </Box>
+        </Box>
+      </Box>
+      {/* Footer label */}
+      <Box sx={{ px: 1.5, pb: 0.8, display: 'flex', alignItems: 'center', gap: 0.8 }}>
+        <Typography sx={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.58rem' }}>📄 file-1770108567078.pdf</Typography>
+        <Box sx={{ bgcolor: '#856404', borderRadius: 1, px: 0.7 }}>
+          <Typography sx={{ color: '#fff', fontSize: '0.55rem' }}>Pending</Typography>
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+function RichContent({ component }: { component: RichComponent }) {
+  if (component === 'nameplate-result') return <NameplateResult />;
+  if (component === 'bar-chart') return <MiniBarChart />;
+  if (component === 'issue-form') return <IssueForm />;
+  if (component === 'pdf-preview') return <PdfPreview />;
+  return null;
+}
+
+// ── Chat message type ────────────────────────────────────────────────────────
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  text: string;
+  attachment?: { name: string; imgSrc?: string };
+  component?: RichComponent;
+}
+
+const INPUT_TYPING_SPEED = 42;   // ms per char
+const SEND_DELAY        = 380;   // pause before message appears
+const THINKING_DURATION = 1400;  // assistant "thinking" duration
+const BETWEEN_TURNS     = 700;   // pause between full turns
+
+type ChatPhase = 'typing-input' | 'sending' | 'thinking' | 'showing-reply' | 'between' | 'done';
+
+export function HeroChatCard() {
+  const { t } = useTranslation('home');
+  const chatTurnsI18n = t('hero.chatTurns', { returnObjects: true }) as Array<{ userText: string; assistantText: string; thinkingLabel: string }>;
+  const CHAT_TURNS: ChatTurn[] = chatTurnsI18n.map((turn, i) => ({
+    ...turn,
+    ...CHAT_TURN_SUPPLEMENTS[i],
+  }));
+  const [turnIndex, setTurnIndex]       = React.useState(0);
+  const [chatPhase, setChatPhase]       = React.useState<ChatPhase>('typing-input');
+  const [inputText, setInputText]       = React.useState('');
+  const GREETING: ChatMessage[] = [{ role: 'assistant', text: t('hero.chat.greeting') }];
+  const [messages, setMessages]         = React.useState<ChatMessage[]>(GREETING);
+  const [isThinking, setIsThinking]     = React.useState(false);
+  const [thinkingLabel, setThinkingLabel] = React.useState('Thinking…');
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom whenever messages or thinking state changes
+  React.useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, isThinking]);
 
   React.useEffect(() => {
-    const media = window.matchMedia?.('(prefers-reduced-motion: reduce)');
-    if (media?.matches) {
-      setTyped(phrases[0]);
-      setPhase('pausing');
-      return;
-    }
-
-    const full = phrases[index];
-    const TYPING_SPEED = 38;
-    const DELETING_SPEED = 24;
-    const PAUSE_TIME = 1400;
-
-    if (phase === 'typing') {
-      if (typed.length < full.length) {
-        const id = setTimeout(() => setTyped(full.slice(0, typed.length + 1)), TYPING_SPEED);
-        return () => clearTimeout(id);
-      } else {
-        const id = setTimeout(() => setPhase('pausing'), PAUSE_TIME);
-        return () => clearTimeout(id);
-      }
-    }
-
-    if (phase === 'pausing') {
-      const id = setTimeout(() => setPhase('deleting'), 300);
+    if (turnIndex >= CHAT_TURNS.length) {
+      // All done — restart after a long pause
+      const id = setTimeout(() => {
+        setMessages(GREETING);
+        setInputText('');
+        setTurnIndex(0);
+        setChatPhase('typing-input');
+      }, 3200);
       return () => clearTimeout(id);
     }
 
-    if (phase === 'deleting') {
-      if (typed.length > 0) {
-        const id = setTimeout(() => setTyped(typed.slice(0, -1)), DELETING_SPEED);
+    const turn = CHAT_TURNS[turnIndex];
+
+    if (chatPhase === 'typing-input') {
+      if (inputText.length < turn.userText.length) {
+        const id = setTimeout(
+          () => setInputText(turn.userText.slice(0, inputText.length + 1)),
+          INPUT_TYPING_SPEED,
+        );
         return () => clearTimeout(id);
       } else {
-        setIndex((i) => (i + 1) % phrases.length);
-        setPhase('typing');
+        const id = setTimeout(() => setChatPhase('sending'), SEND_DELAY);
+        return () => clearTimeout(id);
       }
     }
-  }, [phase, typed, index]);
 
-  // ---- Rotating subline ----
-  const sublines = [
-    'Turn test results into insight, instantly.',
-    'Cut paperwork. Focus on engineering.',
-    'Commission faster. Prove every milestone.',
-  ];
-  const [subIndex, setSubIndex] = React.useState(0);
-  const [allowAnim, setAllowAnim] = React.useState(true);
-
-  React.useEffect(() => {
-    const media = window.matchMedia?.('(prefers-reduced-motion: reduce)');
-    const reduced = !!media?.matches;
-    setAllowAnim(!reduced);
-    if (reduced) return;
-
-    const id = setInterval(() => {
-      setSubIndex((i) => (i + 1) % sublines.length);
-    }, 7000);
-    return () => clearInterval(id);
-  }, []);
-
-  // ---- Micro-parallax (sets CSS vars on the hero) ----
-  const heroRef = React.useRef<HTMLDivElement | null>(null);
-  const onMouseMove = (e: React.MouseEvent) => {
-    const el = heroRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    const px = (x - 0.5) * 16;
-    const py = (y - 0.5) * 16;
-    el.style.setProperty('--px', `${px}px`);
-    el.style.setProperty('--py', `${py}px`);
-  };
-
-  // ---- Hero video carousel state and theme selection ----
-  const theme = useTheme();
-  const { mode, systemMode } = useColorScheme();
-  const resolvedMode = mode === 'system' ? systemMode : mode;
-  const fallbackMode = (theme as any)?.vars?.colorScheme || (theme as any)?.palette?.mode;
-  const finalMode = resolvedMode ?? fallbackMode;
-  const isDark = finalMode === 'dark';
-  const heroFiles = isDark
-    ? ['issues-dark.mp4', 'planner-dark.mp4']
-    : ['issues-light.mp4', 'planner-light.mp4'];
-
-  const [current, setCurrent] = React.useState(0);
-  const [ratio, setRatio] = React.useState<number | null>(null);
-  const handlePrev = () => setCurrent((p) => (p === 0 ? heroFiles.length - 1 : p - 1));
-  const handleNext = () => setCurrent((p) => (p === heroFiles.length - 1 ? 0 : p + 1));
-
-  React.useEffect(() => {
-    setCurrent(0);
-  }, [isDark]);
-
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') handlePrev();
-      if (e.key === 'ArrowRight') handleNext();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
-  // Lazy-load and ensure autoplay for the current hero video
-  const videoContainerRef = React.useRef<HTMLDivElement | null>(null);
-  const videoRef = React.useRef<HTMLVideoElement | null>(null);
-  const [inView, setInView] = React.useState(false);
-  const [canPlay, setCanPlay] = React.useState(false);
-
-  React.useEffect(() => {
-    const el = videoContainerRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          setInView(entry.isIntersecting);
-        }
-      },
-      { root: null, rootMargin: '200px 0px', threshold: 0.2 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  React.useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    setCanPlay(false);
-    v.muted = true; // iOS autoplay requirement
-    if (inView) {
-      setTimeout(() => v.play().catch(() => { }), 0);
-    } else {
-      v.pause();
+    if (chatPhase === 'sending') {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'user', text: turn.userText, attachment: turn.userAttachment },
+      ]);
+      setInputText('');
+      setThinkingLabel(turn.thinkingLabel ?? 'Thinking…');
+      setIsThinking(true);
+      setChatPhase('thinking');
     }
-  }, [current, inView]);
+
+    if (chatPhase === 'thinking') {
+      const id = setTimeout(() => {
+        setIsThinking(false);
+        setChatPhase('showing-reply');
+      }, THINKING_DURATION);
+      return () => clearTimeout(id);
+    }
+
+    if (chatPhase === 'showing-reply') {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', text: turn.assistantText, component: turn.assistantComponent },
+      ]);
+      setChatPhase('between');
+    }
+
+    if (chatPhase === 'between') {
+      const id = setTimeout(() => {
+        setTurnIndex((t) => t + 1);
+        setChatPhase('typing-input');
+      }, BETWEEN_TURNS);
+      return () => clearTimeout(id);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatPhase, inputText, turnIndex]);
 
   return (
-    <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: 'easeOut' }}>
-      <style dangerouslySetInnerHTML={{ __html: keyframes }} />
-
+    <Box
+      sx={{
+        position: 'relative',
+        animation: `${floatCard} 5.5s ease-in-out infinite`,
+        borderRadius: '22px',
+        background: 'rgba(23,23,23,0.97)',
+        border: '1px solid rgba(255,255,255,0.07)',
+        boxShadow: '0 16px 48px rgba(0,0,0,0.88), 0 0 0 1px rgba(255,255,255,0.04)',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        height: 520,
+        width: '100%',
+        maxWidth: 440,
+        mx: 'auto',
+      }}
+    >
+      {/* Top edge highlight */}
+      <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1.5px', background: 'linear-gradient(90deg, transparent, rgba(180,255,150,0.45) 30%, rgba(220,255,180,0.85) 50%, rgba(180,255,150,0.45) 70%, transparent 100%)', zIndex: 4, pointerEvents: 'none' }} />
+      {/* Ambient orbs */}
+      <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+        <Box sx={{ position: 'absolute', top: '-35%', left: '-20%', width: '65%', height: '65%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(180,255,80,0.06) 0%, rgba(140,220,50,0.02) 45%, transparent 70%)', filter: 'blur(42px)', animation: `${orbDrift1} 9s ease-in-out infinite` }} />
+        <Box sx={{ position: 'absolute', bottom: '-18%', right: '-15%', width: '52%', height: '52%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(210,255,120,0.04) 0%, transparent 70%)', filter: 'blur(34px)', animation: `${orbDrift2} 12s ease-in-out infinite` }} />
+      </Box>
+      {/* ── Header bar ── */}
       <Box
-        id="hero"
-        ref={heroRef}
-        onMouseMove={onMouseMove}
-        sx={(theme) => ({
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.5,
+          px: 2.5,
+          py: 1.5,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          backgroundColor: '#0f0f0f',
+          flexShrink: 0,
           position: 'relative',
-          width: '100%',
-          overflow: 'hidden',
-          backgroundRepeat: 'no-repeat',
-          backgroundImage:
-            'radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210, 100%, 90%), transparent)',
-          ...theme.applyStyles('dark', {
-            backgroundImage:
-              'radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210, 100%, 16%), transparent)',
-          }),
-        })}
+          zIndex: 1,
+        }}
       >
-        {/* Aurora (now follows cursor a tiny bit) */}
-        <Box
-          aria-hidden
-          sx={(theme) => ({
-            position: 'absolute',
-            inset: -200,
-            filter: 'blur(80px)',
-            opacity: 0.45,
-            pointerEvents: 'none',
-            transform: 'translate3d(calc(var(--px, 0px) * 0.25), calc(var(--py, 0px) * 0.25), 0)',
-            transition: 'transform 250ms ease-out',
-            background:
-              `radial-gradient(350px 220px at 20% 20%, ${theme.palette.primary.main}20, transparent),
-               radial-gradient(320px 240px at 80% 15%, ${theme.palette.secondary.main}22, transparent),
-               radial-gradient(300px 240px at 30% 80%, ${theme.palette.primary.light}18, transparent)`,
-            ...theme.applyStyles('dark', { opacity: 0.35 }),
-          })}
-        />
+        {/* Traffic-light dots */}
+        <Box sx={{ display: 'flex', gap: 0.6 }}>
+          {['#ff5f57','#febc2e','#28c840'].map((c) => (
+            <Box key={c} sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: c, opacity: 0.85 }} />
+          ))}
+        </Box>
+        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Box
+            component="img"
+            src="/icon.svg"
+            alt="Cx Assistant"
+            sx={{ height: 22, width: 'auto' }}
+          />
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#28c840' }} />
+          <Typography sx={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.68rem' }}>{t('hero.chat.online')}</Typography>
+        </Box>
+      </Box>
 
-        {/* Subtle moving grid */}
-        <Box
-          aria-hidden
-          sx={(theme) => ({
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-            opacity: 0.08,
-            backgroundImage:
-              `linear-gradient(to right, ${theme.palette.divider} 1px, transparent 1px),
-               linear-gradient(to bottom, ${theme.palette.divider} 1px, transparent 1px)`,
-            backgroundSize: '48px 48px',
-            animation: 'gridScroll 30s linear infinite',
-            ...theme.applyStyles('dark', { opacity: 0.06 }),
-          })}
-        />
-
-        <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: { xs: 14, sm: 20 }, pb: { xs: 8, sm: 12 } }}>
-          {/* Top hero: text left, sphere right (stack on mobile) */}
-          <Box sx={{ width: '100%', display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1.1fr 1fr' }, gap: { xs: 4, md: 6 }, alignItems: 'center' }}>
-            <Stack spacing={2} useFlexGap sx={{ alignItems: { xs: 'center', md: 'flex-start' }, width: '100%' }}>
-              {/* Typewriter headline with real caret span (multiline-safe) */}
-              <Box height={135} sx={{ width: '100%' }}>
-                <Typography
-                  component={motion.span}
-                  variant="h1"
-                  aria-live="polite"
-                  sx={(theme) => ({
-                    fontSize: 'clamp(1.6rem, 5.5vw, 3.6rem)',
-                    display: 'inline',
-                    mb: 3,
-                    letterSpacing: 0.2,
-                    textAlign: { xs: 'center', md: 'left' },
-                    backgroundImage: `linear-gradient(90deg,
-                      ${theme.palette.primary.main},
-                      ${theme.palette.secondary.main},
-                      ${theme.palette.primary.main})`,
-                    backgroundSize: '200% 100%',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    animation: phase === 'pausing' ? 'shimmer 8s linear infinite' : 'none',
-                    position: 'relative',
-                    lineHeight: 1.2,
-                    minHeight: '1em',
-                    whiteSpace: 'normal',
-                    wordBreak: 'break-word',
-                  })}
-                >
-                  <span style={{ whiteSpace: 'pre-wrap' }}>{typed}</span>
-                  {phase !== 'pausing' && (
-                    <Box
-                      component="span"
-                      sx={{
-                        display: 'inline-block',
-                        width: '2px',
-                        height: '1em',
-                        ml: 0.5,
-                        backgroundColor: 'currentColor',
-                        animation: 'caretBlink 1s steps(2, start) infinite',
-                        verticalAlign: '-0.1em',
-                      }}
-                    />
-                  )}
-                </Typography>
-              </Box>
-
-              {/* Supporting line under headline */}
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                sx={{
-                  mt: 1,
-                  maxWidth: 640,
-                  textAlign: { xs: 'center', md: 'left' },
-                }}
-              >
-                Cx Assistant helps commissioning teams capture issues, plan milestones, and deliver faster with AI support.
-              </Typography>
-
-              {/* Primary call-to-action */}
-              <Stack direction={{ xs: 'column' }} spacing={2} useFlexGap sx={{ pt: 3, alignSelf: { xs: 'center', md: 'flex-start' } }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  href="/login"
+      {/* ── Message list ── */}
+      <Box
+        ref={scrollRef}
+        sx={{
+          flex: 1,
+          overflowY: 'auto',
+          px: 2,
+          py: 1.5,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1.2,
+          scrollBehavior: 'smooth',
+          position: 'relative',
+          zIndex: 1,
+          '&::-webkit-scrollbar': { width: 4 },
+          '&::-webkit-scrollbar-track': { background: 'transparent' },
+          '&::-webkit-scrollbar-thumb': { background: 'rgba(255,255,255,0.1)', borderRadius: 4 },
+        }}
+      >
+        {messages.map((msg, i) => (
+          <Box
+            key={i}
+            sx={{
+              display: 'flex',
+              justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+              animation: 'heroChatFadeUp 0.3s ease both',
+              '@keyframes heroChatFadeUp': {
+                from: { opacity: 0, transform: 'translateY(6px)' },
+                to:   { opacity: 1, transform: 'translateY(0)' },
+              },
+            }}
+          >
+            <Box sx={{ maxWidth: '82%', display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+              {/* Attachment bubble (user only) */}
+              {msg.attachment && (
+                <Box
                   sx={{
-                    px: 3.5,
-                    py: 1.25,
-                    borderRadius: 999,
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    boxShadow: 'none',
-                    '&:hover': { boxShadow: 'none' },
+                    mb: 0.5,
+                    px: 1.2, py: 0.8,
+                    borderRadius: '10px 10px 10px 10px',
+                    backgroundColor: '#23262a',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    display: 'flex', alignItems: 'center', gap: 0.8,
                   }}
                 >
-                  Get started
-                </Button>
-              </Stack>
-            </Stack>
-
-            {/* Right column: Three.js glowing sphere */}
-            <Box sx={{ width: '100%' }}>
-              <GradientSphere />
+                  <Box sx={{ width: 36, height: 36, borderRadius: 1, bgcolor: '#333', overflow: 'hidden', flexShrink: 0 }}>
+                    {msg.attachment.imgSrc ? (
+                      <Box component="img" src={msg.attachment.imgSrc} alt="attachment" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>📷</Box>
+                    )}
+                  </Box>
+                  <Typography sx={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.65rem' }}>{msg.attachment.name}</Typography>
+                </Box>
+              )}
+              {/* Message */}
+              {msg.role === 'user' ? (
+                <Box
+                  sx={{
+                    px: 1.8, py: 1.1,
+                    borderRadius: '14px 14px 4px 14px',
+                    backgroundColor: '#1c2128',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.75)',
+                      fontSize: '0.78rem',
+                      fontFamily: "'Roboto', sans-serif",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {msg.text}
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ py: 0.3 }}>
+                  <Typography
+                    sx={{
+                      color: 'rgba(255,255,255,0.88)',
+                      fontSize: '0.78rem',
+                      fontFamily: "'Roboto', sans-serif",
+                      lineHeight: 1.6,
+                      whiteSpace: 'pre-line',
+                    }}
+                  >
+                    {msg.text}
+                  </Typography>
+                  {msg.component && <RichContent component={msg.component} />}
+                </Box>
+              )}
             </Box>
           </Box>
+        ))}
 
-          {/* Carousel Card (manual only) */}
+        {/* Thinking indicator */}
+        {isThinking && (
           <Box
-            component={motion.div}
-            sx={(theme) => ({
-              alignSelf: 'center',
-              width: '100%',
-              maxWidth: 1400,
-              mt: { xs: 8, sm: 10 },
-              borderRadius: (theme.vars || theme).shape.borderRadius,
-              outline: '6px solid',
-              outlineColor: 'hsla(220, 25%, 80%, 0.2)',
-              border: '1px solid',
-              borderColor: (theme.vars || theme).palette.grey[200],
-              background: (theme.vars || theme).palette.background.paper,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative',
-              overflow: 'hidden',
-              animation: 'glowPulse 6s ease-in-out infinite',
-              ...theme.applyStyles('dark', {
-                outlineColor: 'hsla(210, 35%, 40%, 0.15)',
-                borderColor: (theme.vars || theme).palette.grey[700],
-                background: (theme.vars || theme).palette.background.default,
-              }),
-              transformStyle: 'preserve-3d',
-              perspective: 1000,
-            })}
-            whileHover={{ rotateX: -2, rotateY: 2 }}
-            transition={{ type: 'spring', stiffness: 80, damping: 12 }}
+            sx={{
+              display: 'flex', alignItems: 'center', gap: 1,
+              animation: 'heroChatFadeUp 0.25s ease both',
+            }}
           >
-            {/* sweep highlight */}
-            <Box
-              aria-hidden
-              sx={{
-                position: 'absolute', inset: 0, pointerEvents: 'none',
-                '&::before': {
-                  content: '" "',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  height: '100%',
-                  width: '30%',
-                  background: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.2) 50%, rgba(255,255,255,0) 100%)',
-                  filter: 'blur(6px)',
-                  animation: 'sweep 6s ease-in-out infinite',
-                },
-              }}
-            />
-
-            <>
-              <IconButton
-                aria-label="Previous slide"
-                onClick={handlePrev}
-                sx={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', bgcolor: 'background.paper', opacity: 0.7, '&:hover': { opacity: 1 }, zIndex: 2 }}
-              >
-                <ArrowBackIosNewIcon />
-              </IconButton>
-
-              <Box ref={videoContainerRef} sx={{ width: '100%', aspectRatio: ratio ?? '16 / 9', display: 'flex', alignItems: 'center', justifyContent: 'center', willChange: 'transform' }}>
-                <motion.video
-                  key={heroFiles[current]}
-                  ref={videoRef}
-                  src={inView ? `/videos/hero/${heroFiles[current]}` : undefined}
-                  aria-label={heroFiles[current].replace(/[-].*|\.mp4$/g, '').replace(/-/g, ' ')}
-                  preload="metadata"
-                  playsInline
-                  autoPlay
-                  muted
-                  loop
-                  controls={false}
-                  disablePictureInPicture
-                  controlsList="nodownload noplaybackrate noremoteplayback nofullscreen"
-                  style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', borderRadius: 'inherit', willChange: 'transform, opacity', background: 'transparent' }}
-                  initial={{ opacity: 0, scale: 0.995 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, ease: 'easeOut' }}
-                  onLoadedMetadata={(e) => {
-                    const vid = e.currentTarget as HTMLVideoElement;
-                    if (vid.videoWidth && vid.videoHeight) setRatio(vid.videoWidth / vid.videoHeight);
-                  }}
-                  onCanPlay={() => setCanPlay(true)}
-                />
-              </Box>
-
-              <IconButton
-                aria-label="Next slide"
-                onClick={handleNext}
-                sx={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', bgcolor: 'background.paper', opacity: 0.7, '&:hover': { opacity: 1 }, zIndex: 2 }}
-              >
-                <ArrowForwardIosIcon />
-              </IconButton>
-
-              <Box sx={{ position: 'absolute', bottom: 12, left: 0, width: '100%', display: 'flex', justifyContent: 'center', gap: 1 }}>
-                {heroFiles.map((_, idx) => (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, py: 0.5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                {[0, 1, 2].map((d) => (
                   <Box
-                    key={idx}
-                    role="button"
-                    aria-label={`Go to slide ${idx + 1}`}
-                    tabIndex={0}
-                    onClick={() => setCurrent(idx)}
-                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setCurrent(idx)}
+                    key={d}
                     sx={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: '50%',
-                      bgcolor: idx === current ? 'primary.main' : 'grey.400',
-                      opacity: idx === current ? 1 : 0.5,
-                      transition: 'all 0.2s',
-                      cursor: 'pointer',
-                      animation: idx === current ? 'dotPulse 2.2s ease-in-out infinite' : undefined,
+                      width: 6, height: 6, borderRadius: '50%',
+                      bgcolor: 'rgba(220,255,182,0.7)',
+                      animation: `heroDot 1.1s ease-in-out ${d * 0.18}s infinite`,
+                      '@keyframes heroDot': {
+                        '0%,80%,100%': { transform: 'scale(0.55)', opacity: 0.4 },
+                        '40%': { transform: 'scale(1)', opacity: 1 },
+                      },
                     }}
                   />
                 ))}
               </Box>
-            </>
+              <Typography sx={{ color: 'rgba(220,255,182,0.55)', fontSize: '0.65rem' }}>{thinkingLabel}</Typography>
+            </Box>
           </Box>
-        </Container>
+        )}
+      </Box>
+
+      {/* ── Input bar ── */}
+      <Box
+        sx={{
+          px: 2, py: 1.5,
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          backgroundColor: '#0f0f0f',
+          flexShrink: 0,
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        {/* Attachment preview strip (shown only while typing, disappears on send) */}
+        {turnIndex < CHAT_TURNS.length && CHAT_TURNS[turnIndex].userAttachment && chatPhase === 'typing-input' && (
+          <Box sx={{ mb: 0.8, display: 'flex', alignItems: 'center', gap: 0.8 }}>
+            <Box sx={{ width: 36, height: 36, borderRadius: 1.2, bgcolor: '#2a2d2f', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden', flexShrink: 0 }}>
+              <Box component="img" src="/images/nameplate.jpg" alt="nameplate" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography sx={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.62rem' }}>{CHAT_TURNS[turnIndex].userAttachment!.name}</Typography>
+            </Box>
+            <Box sx={{ width: 14, height: 14, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'default' }}>
+              <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.55rem', lineHeight: 1 }}>✕</Typography>
+            </Box>
+          </Box>
+        )}
+        <Box
+          sx={{
+            display: 'flex', alignItems: 'center', gap: 1,
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: inputText ? 'rgba(220,255,182,0.22)' : 'rgba(255,255,255,0.08)',
+            backgroundColor: '#1a1a1a',
+            px: 1.8, py: 0.9,
+            transition: 'border-color 0.2s',
+          }}
+        >
+          <AttachFileIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '1rem', flexShrink: 0 }} />
+          <Typography
+            sx={{
+              flex: 1,
+              color: inputText ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.3)',
+              fontSize: '0.78rem',
+              fontFamily: "'Roboto', sans-serif",
+              minHeight: '1.2em',
+              letterSpacing: 0.1,
+            }}
+          >
+            {inputText || t('hero.chat.inputPlaceholder')}
+            {inputText && (
+              <Box
+                component="span"
+                sx={{
+                  display: 'inline-block',
+                  width: '1.5px', height: '0.9em',
+                  ml: '1px',
+                  backgroundColor: '#DCFFB6',
+                  animation: 'caretBlink 1s steps(2,start) infinite',
+                  verticalAlign: '-0.05em',
+                }}
+              />
+            )}
+          </Typography>
+          <Box
+            sx={{
+              width: 26, height: 26,
+              borderRadius: 1.2,
+              backgroundColor: inputText ? '#DCFFB6' : 'rgba(220,255,182,0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: inputText ? '#111314' : 'rgba(220,255,182,0.4)',
+              fontSize: '0.7rem',
+              flexShrink: 0,
+              transition: 'all 0.2s',
+            }}
+          >
+            <SendIcon sx={{ fontSize: '0.8rem' }} />
+          </Box>
+        </Box>
+        <Typography sx={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.58rem', textAlign: 'center', mt: 0.6 }}>
+          {t('hero.chat.disclaimer')}
+        </Typography>
+      </Box>
+    </Box>
+  );
+}
+
+
+// ─── Hero animated stat cards ─────────────────────────────────────────────────
+
+/** Counts from 0 to `target` over `durationMs`, starting after `delayS` seconds. */
+function useCountUp(target: number, durationMs: number, delayS: number) {
+  const [count, setCount] = React.useState(0);
+  React.useEffect(() => {
+    let rafId: number;
+    const timerId = setTimeout(() => {
+      let startTs: number | null = null;
+      const tick = (ts: number) => {
+        if (!startTs) startTs = ts;
+        const p = Math.min((ts - startTs) / durationMs, 1);
+        // easeOutQuart
+        const eased = 1 - Math.pow(1 - p, 4);
+        setCount(Math.round(eased * target));
+        if (p < 1) rafId = requestAnimationFrame(tick);
+      };
+      rafId = requestAnimationFrame(tick);
+    }, delayS * 1000 + 300);
+    return () => { clearTimeout(timerId); cancelAnimationFrame(rafId); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return count;
+}
+
+interface StatCardData {
+  label: string;
+  target: number;
+  suffix: string;
+  sub: string;
+  Icon: React.ElementType;
+  position: { top: string; left?: string; right?: string };
+  floatDuration: number;
+  floatDelay: number;
+  entranceDelay: number;
+}
+
+const HERO_STAT_CARDS: StatCardData[] = [
+  {
+    label: 'TOTAL ASSETS',
+    target: 237,
+    suffix: '',
+    sub: 'All tracked assets',
+    Icon: Inventory2OutlinedIcon,
+    position: { top: '13%', left: '6.6%' },
+    floatDuration: 5.2,
+    floatDelay: 0,
+    entranceDelay: 0.9,
+  },
+  {
+    label: 'TOTAL ISSUES',
+    target: 1022,
+    suffix: '',
+    sub: 'Created in project',
+    Icon: BugReportOutlinedIcon,
+    position: { top: '13%', left: '36.2%' },
+    floatDuration: 5.8,
+    floatDelay: 0.85,
+    entranceDelay: 1.1,
+  },
+  {
+    label: 'OPEN ISSUES',
+    target: 761,
+    suffix: '',
+    sub: 'Awaiting resolution',
+    Icon: BugReportOutlinedIcon,
+    position: { top: '32%', left: '6.6%' },
+    floatDuration: 6.1,
+    floatDelay: 0.4,
+    entranceDelay: 1.3,
+  },
+  {
+    label: 'COMPLETION RATE',
+    target: 8,
+    suffix: '%',
+    sub: 'Avg. status flow progress',
+    Icon: AutorenewOutlinedIcon,
+    position: { top: '32%', left: '36.2%' },
+    floatDuration: 5.5,
+    floatDelay: 1.25,
+    entranceDelay: 1.5,
+  },
+];
+
+function HeroStatCard({ card }: { card: StatCardData }) {
+  const count = useCountUp(card.target, 1600, card.entranceDelay);
+  // Card is ~26% of the screenshot container (~76-84vw, capped at 920px).
+  // All internal sizes use vw so they scale 1:1 with the card as the viewport changes.
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 18, scale: 0.90 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.85, delay: card.entranceDelay, ease: [0.16, 1, 0.3, 1] }}
+      style={{ position: 'absolute', width: '27.5%', ...card.position, zIndex: 6 }}
+    >
+      <Box
+        sx={{
+          animation: `heroCardFloat ${card.floatDuration}s ease-in-out ${card.floatDelay}s infinite`,
+          '@keyframes heroCardFloat': {
+            '0%,100%': { transform: 'translateY(0px)' },
+            '50%': { transform: 'translateY(-8px)' },
+          },
+          position: 'relative',
+          borderRadius: 'clamp(4px, 0.7vw, 10px)',
+          overflow: 'hidden',
+          bgcolor: 'rgba(23, 23, 23, 0.97)',
+          border: '1px solid rgba(255,255,255,0.07)',
+          boxShadow: '0 16px 48px rgba(0,0,0,0.88), 0 0 0 1px rgba(255,255,255,0.04)',
+          padding: 'clamp(5px, 0.85vw, 12px)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'clamp(2px, 0.32vw, 4px)',
+        }}
+      >
+        {/* Lime glow line on top */}
+        <Box sx={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0,
+          height: '2px',
+          background: 'linear-gradient(90deg, transparent 0%, rgba(180,255,120,0.28) 25%, rgba(220,255,130,0.62) 50%, rgba(180,255,120,0.28) 75%, transparent 100%)',
+          boxShadow: '0 0 4px rgba(200,255,120,0.28)',
+          zIndex: 2,
+        }} />
+
+        {/* Label + icon row */}
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'clamp(2px, 0.4vw, 5px)' }}>
+          <Typography sx={{
+            color: 'rgba(255,255,255,0.42)',
+            fontSize: 'clamp(4px, 0.58vw, 7px)',
+            letterSpacing: '0.09em',
+            textTransform: 'uppercase',
+            fontWeight: 600,
+            lineHeight: 1.2,
+          }}>
+            {card.label}
+          </Typography>
+          <Box sx={{
+            width: 'clamp(12px, 1.75vw, 22px)',
+            height: 'clamp(12px, 1.75vw, 22px)',
+            borderRadius: '50%',
+            bgcolor: 'rgba(180,255,120,0.10)',
+            border: '1px solid rgba(180,255,120,0.20)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <card.Icon sx={{ fontSize: 'clamp(6px, 0.88vw, 11px)', color: '#DCFFB6' }} />
+          </Box>
+        </Box>
+        {/* Animated number */}
+        <Typography sx={{
+          color: '#fff',
+          fontSize: 'clamp(9px, 1.72vw, 22px)',
+          fontWeight: 800,
+          lineHeight: 1,
+          fontFamily: "'Space Grotesk', sans-serif",
+          letterSpacing: '-0.02em',
+          fontVariantNumeric: 'tabular-nums',
+        }}>
+          {count.toLocaleString()}{card.suffix}
+        </Typography>
+        {/* Subtitle */}
+        <Typography sx={{
+          color: 'rgba(255,255,255,0.30)',
+          fontSize: 'clamp(3px, 0.48vw, 6px)',
+          lineHeight: 1.3,
+        }}>
+          {card.sub}
+        </Typography>
       </Box>
     </motion.div>
+  );
+}
+
+// ─── Cinematic variants for stagger reveal ────────────────────────────────────
+
+const heroContainerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.18, delayChildren: 0.1 } },
+};
+
+const heroItemVariants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } },
+};
+
+export default function Hero() {
+  const { t } = useTranslation('home');
+  const lp = useLangPath();
+  const phrases = t('hero.phrases', { returnObjects: true }) as string[];
+  const [phraseIdx, setPhraseIdx] = React.useState(0);
+  const [fontsReady, setFontsReady] = React.useState(false);
+
+  React.useEffect(() => {
+    const load = async () => {
+      try {
+        await document.fonts.load('800 1em "Space Grotesk"');
+      } catch (_) {
+        // ignore — best effort
+      }
+      setFontsReady(true);
+    };
+    load();
+  }, []);
+
+  React.useEffect(() => {
+    const id = setInterval(() => {
+      setPhraseIdx((i) => (i + 1) % phrases.length);
+    }, 3600);
+    return () => clearInterval(id);
+  }, [phrases.length]);
+
+  return (
+    <Box
+      id="hero"
+      sx={{
+        position: 'relative',
+        width: '100%',
+        minHeight: '100vh',
+        overflow: 'hidden',
+        bgcolor: '#070709',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {/* ── Ambient glow orbs ── */}
+      <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+        <Box sx={{
+          position: 'absolute', top: '-15%', left: '-8%',
+          width: '55%', height: '65%',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(190,255,80,0.09) 0%, rgba(150,230,40,0.03) 50%, transparent 70%)',
+          filter: 'blur(90px)',
+          animation: `${orbDrift1} 16s ease-in-out infinite`,
+        }} />
+        <Box sx={{
+          position: 'absolute', bottom: '10%', right: '-5%',
+          width: '40%', height: '50%',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(200,255,90,0.05) 0%, transparent 70%)',
+          filter: 'blur(70px)',
+          animation: `${orbDrift2} 20s ease-in-out infinite`,
+        }} />
+      </Box>
+
+      {/* ── Text zone ── */}
+      <Container
+        maxWidth="md"
+        sx={{
+          position: 'relative',
+          zIndex: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          pt: { xs: '16vh', sm: '14vh' },
+          pb: 0,
+          textAlign: 'center',
+        }}
+      >
+        <Box
+          component={motion.div}
+          variants={heroContainerVariants}
+          initial="hidden"
+          animate="visible"
+          sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: { xs: 1.4, sm: 1.8 } }}
+        >
+          {/* Eyebrow badge */}
+          <Box
+            component={motion.div}
+            variants={heroItemVariants}
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              border: '1px solid rgba(220,255,182,0.30)',
+              borderRadius: '50px',
+              px: 2.2,
+              py: 0.55,
+              backdropFilter: 'blur(10px)',
+              bgcolor: 'rgba(0,0,0,0.28)',
+            }}
+          >
+            <Typography sx={{ color: '#DCFFB6', fontSize: '0.67rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
+              {t('hero.badge')}
+            </Typography>
+          </Box>
+
+          {/* Main headline */}
+          <Box
+            component={motion.div}
+            variants={heroItemVariants}
+            sx={{
+              minHeight: { xs: '7rem', sm: '5rem' },
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: fontsReady ? 1 : 0,
+              transition: 'opacity 0.25s ease',
+            }}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={phraseIdx}
+                style={{ position: 'absolute' }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.4, ease: 'easeInOut' }}
+              >
+                <Typography
+                  variant="h1"
+                  sx={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: { xs: 'clamp(2rem, 7vw, 2.8rem)', sm: 'clamp(2.4rem, 5vw, 3.6rem)' },
+                    fontWeight: 800,
+                    lineHeight: 1.08,
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  {/* Base words — left-to-right shimmer sweep */}
+                  <Box
+                    component="span"
+                    sx={{
+                      background: 'linear-gradient(90deg, rgba(255,255,255,0.78) 0%, #fff 30%, rgba(230,255,200,0.85) 50%, #fff 70%, rgba(255,255,255,0.78) 100%)',
+                      backgroundSize: '260% auto',
+                      animation: `${shimmerSweep} 4s ease-in-out infinite`,
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    }}
+                  >
+                    {phrases[phraseIdx].split(' ').slice(0, -1).join(' ')}{' '}
+                  </Box>
+                  {/* Last word — brand green accent */}
+                  <Box
+                    component="span"
+                    sx={{
+                      WebkitTextFillColor: '#DCFFB6',
+                      color: '#DCFFB6',
+                      textShadow: '0 0 28px rgba(220,255,182,0.38), 0 0 60px rgba(220,255,182,0.14)',
+                    }}
+                  >
+                    {phrases[phraseIdx].split(' ').slice(-1)[0]}
+                  </Box>
+                </Typography>
+              </motion.div>
+            </AnimatePresence>
+          </Box>
+
+          {/* Subtitle */}
+          <Box component={motion.div} variants={heroItemVariants}>
+            <Typography
+              sx={{
+                color: 'rgba(255,255,255,0.60)',
+                maxWidth: 500,
+                fontSize: { xs: '0.88rem', sm: '0.96rem' },
+                lineHeight: 1.75,
+                fontWeight: 400,
+              }}
+            >
+              {t('hero.subtitle')}
+            </Typography>
+          </Box>
+
+          {/* CTAs */}
+          <Box
+            component={motion.div}
+            variants={heroItemVariants}
+            sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.2, pt: 0.5 }}
+          >
+            <Button
+              variant="contained"
+              size="large"
+              href="https://app.cx-assistant.com/sign-up"
+              sx={{
+                px: 4, py: 1.1, borderRadius: 2, textTransform: 'none', fontWeight: 700, fontSize: '0.92rem',
+                bgcolor: '#DCFFB6', color: '#111',
+                boxShadow: '0 4px 28px rgba(220,255,182,0.20)',
+                '&:hover': { bgcolor: '#c8f0a0', transform: 'translateY(-2px)', boxShadow: '0 8px 32px rgba(220,255,182,0.30)' },
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {t('hero.ctaPrimary')}
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              href={lp('/blog')}
+              sx={{
+                px: 4, py: 1.1, borderRadius: 2, textTransform: 'none', fontWeight: 600, fontSize: '0.92rem',
+                border: '1.5px solid rgba(255,255,255,0.26)', color: '#fff',
+                backdropFilter: 'blur(8px)',
+                bgcolor: 'rgba(255,255,255,0.05)',
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.1)', border: '1.5px solid rgba(255,255,255,0.52)', transform: 'translateY(-2px)' },
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {t('hero.ctaSecondary')}
+            </Button>
+          </Box>
+        </Box>
+      </Container>
+
+      {/* ── 3D screenshot scene ── */}
+      <Box
+        sx={{
+          position: 'relative',
+          zIndex: 2,
+          flex: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          pt: { xs: 5, sm: 7 },
+          px: { xs: '8%', sm: '10%', md: '12%' },
+        }}
+      >
+        {/* Perspective wrapper */}
+        <Box
+          sx={{ position: 'relative', width: '100%', maxWidth: 920 }}
+          style={{ perspective: '1400px', perspectiveOrigin: '50% 20%' }}
+        >
+          {/* Rocking 3D screenshot */}
+          <Box
+            component={motion.div}
+            initial={{ rotateX: 8, rotateY: -10, opacity: 0, y: 48 }}
+            animate={{
+              rotateX: [8, 11, 9, 6, 8],
+              rotateY: [-10, -7, -10, -13, -10],
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              rotateX: { duration: 18, ease: 'easeInOut', repeat: Infinity, times: [0, 0.25, 0.5, 0.75, 1] },
+              rotateY: { duration: 18, ease: 'easeInOut', repeat: Infinity, times: [0, 0.25, 0.5, 0.75, 1] },
+              opacity: { duration: 1.0, delay: 0.5 },
+              y: { duration: 1.0, delay: 0.5, ease: [0.16, 1, 0.3, 1] },
+            }}
+            style={{ transformStyle: 'preserve-3d', transformOrigin: 'center top', position: 'relative' }}
+          >
+            {/* Screenshot frame */}
+            <Box
+              sx={{
+                borderRadius: '16px',
+                overflow: 'hidden',
+                boxShadow: '0 50px 120px rgba(0,0,0,0.88), 0 0 0 1px rgba(255,255,255,0.08), 0 0 80px rgba(80,200,80,0.10)',
+                position: 'relative',
+              }}
+            >
+              <Box
+                component="img"
+                src="/hero/screenshot-without-cards.png"
+                alt="Cx Assistant Dashboard"
+                sx={{ width: '100%', display: 'block', height: 'auto' }}
+              />
+              {/* Bottom fade — inside frame so it stays co-planar with the image in 3D.
+                  Tall enough (85%) that the right edge is always covered regardless of rotateY. */}
+              <Box sx={{
+                position: 'absolute',
+                bottom: 0, left: 0, right: 0,
+                height: '85%',
+                background: 'linear-gradient(to bottom, transparent 0%, transparent 22%, rgba(7,7,9,0.18) 45%, rgba(7,7,9,0.60) 62%, #070709 76%)',
+                pointerEvents: 'none',
+                zIndex: 3,
+              }} />
+              {/* Green shimmer top edge */}
+              <Box sx={{
+                position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
+                background: 'linear-gradient(90deg, transparent 0%, rgba(180,255,150,0.55) 30%, rgba(220,255,180,0.95) 50%, rgba(180,255,150,0.55) 70%, transparent 100%)',
+                zIndex: 2,
+              }} />
+            </Box>
+
+            {/* Animated stat cards — positioned at their original screenshot locations */}
+            {HERO_STAT_CARDS.map((card) => (
+              <HeroStatCard key={card.label} card={card} />
+            ))}
+          </Box>
+
+          {/* Radial glow under screenshot — kept very subtle */}
+          <Box sx={{
+            position: 'absolute',
+            bottom: '12%', left: '20%', right: '20%',
+            height: 50,
+            background: 'radial-gradient(ellipse, rgba(190,255,80,0.06) 0%, transparent 70%)',
+            filter: 'blur(18px)',
+            pointerEvents: 'none',
+            zIndex: 9,
+          }} />
+
+          {/* Outer fade — just a soft final bleed at the very bottom */}
+          <Box sx={{
+            position: 'absolute',
+            bottom: 0, left: 0, right: 0,
+            height: '28%',
+            background: 'linear-gradient(to bottom, transparent 0%, #070709 100%)',
+            pointerEvents: 'none',
+            zIndex: 10,
+          }} />
+        </Box>
+      </Box>
+    </Box>
   );
 }

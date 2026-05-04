@@ -1,65 +1,32 @@
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import AutoFixHighRoundedIcon from '@mui/icons-material/AutoFixHighRounded';
-import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
-import QueryStatsRoundedIcon from '@mui/icons-material/QueryStatsRounded';
-import SettingsSuggestRoundedIcon from '@mui/icons-material/SettingsSuggestRounded';
-import SupportAgentRoundedIcon from '@mui/icons-material/SupportAgentRounded';
-import ThumbUpAltRoundedIcon from '@mui/icons-material/ThumbUpAltRounded';
-
-const items = [
-  {
-    icon: <SettingsSuggestRoundedIcon />,
-    title: 'Engineer Advantages',
-    description:
-      'Spend less time on spreadsheets and admin, more time on actual engineering. Get instant answers to repetitive questions, clear asset and project overviews, and smarter reporting with ready-to-use charts and summaries.',
-  },
-  {
-    icon: <ConstructionRoundedIcon />,
-    title: 'Decision Maker Advantages',
-    description:
-      'Quality & Compliance: AI-powered validation catches errors before they become risks. Efficiency: Automated workflows and real-time insights accelerate commissioning timelines. Scalability: A single platform for multiple sites and projects.',
-  },
-  {
-    icon: <ThumbUpAltRoundedIcon />,
-    title: 'Cost Savings',
-    description:
-      'Reduce rework, manual effort, and delays. Cx Assistant pays for itself within the first projects.',
-  },
-  {
-    icon: <AutoFixHighRoundedIcon />,
-    title: 'Future-Proof',
-    description:
-      'Built on modern architecture with AI at its core, Cx Assistant evolves with technology and your needs.',
-  },
-  {
-    icon: <SupportAgentRoundedIcon />,
-    title: 'Why Now?',
-    description:
-      'Commissioning is increasingly complex, global, and time-critical. Cx Assistant bridges human expertise and AI automation for faster, safer, and more consistent project delivery.',
-  },
-  {
-    icon: <QueryStatsRoundedIcon />,
-    title: 'In Short',
-    description:
-      'Cx Assistant is not just another commissioning app. It’s a digital partner for engineers and a strategic advantage for decision makers.',
-  },
-];
+import ListAltRoundedIcon from '@mui/icons-material/ListAltRounded';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 
 export default function Highlights() {
+  const { t } = useTranslation('home');
+
+  const items = [
+    { icon: <ListAltRoundedIcon />, title: t('highlights.assetTracking.title'), description: t('highlights.assetTracking.description') },
+    { icon: <WarningAmberRoundedIcon />, title: t('highlights.issueManagement.title'), description: t('highlights.issueManagement.description') },
+    { icon: <ArticleRoundedIcon />, title: t('highlights.documentation.title'), description: t('highlights.documentation.description') },
+  ];
+
   return (
     <Box
       id="highlights"
       sx={{
         pt: { xs: 4, sm: 12 },
         pb: { xs: 8, sm: 16 },
-        color: 'white',
-        bgcolor: 'grey.900',
+        backgroundColor: 'grey.100',
+        width: '100%',
       }}
     >
       <Container
@@ -74,38 +41,76 @@ export default function Highlights() {
         <Box
           sx={{
             width: { sm: '100%', md: '60%' },
-            textAlign: { sm: 'left', md: 'center' },
+            textAlign: 'center',
           }}
         >
-          <Typography component="h2" variant="h4" gutterBottom>
-            Why Cx Assistant?
+          <Typography
+            component="h2"
+            variant="h1"
+            gutterBottom
+            sx={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 700,
+              letterSpacing: 0.2,
+            }}
+          >
+            {t('highlights.title')}
           </Typography>
-          <Typography variant="body1" sx={{ color: 'grey.400' }}>
-            Discover how Cx Assistant transforms commissioning: smarter workflows, instant answers, compliance, and cost savings—all in one intelligent platform.
+          <Typography
+            variant="body1"
+            sx={{ color: 'text.secondary', fontFamily: "'Roboto', sans-serif", fontSize: '1rem' }}
+          >
+            {t('highlights.subtitle')}
           </Typography>
         </Box>
-        <Grid container spacing={2}>
+        <Grid container spacing={3} justifyContent="center">
           {items.map((item, index) => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
               <Stack
                 direction="column"
                 component={Card}
+                elevation={0}
                 spacing={1}
                 useFlexGap
                 sx={{
                   color: 'inherit',
                   p: 3,
                   height: '100%',
-                  borderColor: 'hsla(220, 25%, 25%, 0.3)',
-                  backgroundColor: 'grey.800',
+                  borderRadius: 2,
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  backgroundColor: '#ffffff',
+                  boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
+                  transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+                  '&:hover': {
+                    transform: 'scale(1.04)',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
+                  },
                 }}
               >
-                <Box sx={{ opacity: '50%' }}>{item.icon}</Box>
+                <Box
+                  sx={{
+                    display: 'inline-flex',
+                    p: 1.2,
+                    borderRadius: 2,
+                    backgroundColor: 'rgba(155, 220, 100, 0.18)',
+                    color: '#5a9e2f',
+                    width: 'fit-content',
+                    mb: 1,
+                  }}
+                >
+                  {item.icon}
+                </Box>
                 <div>
-                  <Typography gutterBottom sx={{ fontWeight: 'medium' }}>
+                  <Typography
+                    gutterBottom
+                    sx={{ fontWeight: 700, fontFamily: "'Roboto', sans-serif", fontSize: '1rem', mb: 1 }}
+                  >
                     {item.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'grey.400' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: 'text.secondary', fontFamily: "'Roboto', sans-serif", lineHeight: 1.6 }}
+                  >
                     {item.description}
                   </Typography>
                 </div>

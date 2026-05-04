@@ -1,4 +1,7 @@
 import * as React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLangPath } from '../i18n/useLang';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
@@ -11,14 +14,12 @@ import Typography from '@mui/material/Typography';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TwitterIcon from '@mui/icons-material/X';
-import SitemarkIcon from './SitemarkIcon';
-
 function Copyright() {
   return (
     <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
       {'Copyright © '}
-      <Link color="text.secondary" href="https://mui.com/">
-        Sitemark
+      <Link color="text.secondary" href="https://cx-assistant.com/">
+        Cx Assistant
       </Link>
       &nbsp;
       {new Date().getFullYear()}
@@ -27,6 +28,8 @@ function Copyright() {
 }
 
 export default function Footer() {
+  const { t } = useTranslation('common');
+  const lp = useLangPath();
   return (
     <Container
       sx={{
@@ -55,14 +58,14 @@ export default function Footer() {
           }}
         >
           <Box sx={{ width: { xs: '100%', sm: '60%' } }}>
-            <SitemarkIcon />
+            <img src="/logo.svg" alt="Cx Assistant Logo" style={{ height: '22px' }} />
             <Typography variant="body2" gutterBottom sx={{ fontWeight: 600, mt: 2 }}>
-              Join the newsletter
+            {t('footer.newsletter.title')}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
-              Subscribe for weekly updates. No spams ever!
+              {t('footer.newsletter.subtitle')}
             </Typography>
-            <InputLabel htmlFor="email-newsletter">Email</InputLabel>
+            <InputLabel htmlFor="email-newsletter">{t('footer.newsletter.emailLabel')}</InputLabel>
             <Stack direction="row" spacing={1} useFlexGap>
               <TextField
                 id="email-newsletter"
@@ -71,11 +74,11 @@ export default function Footer() {
                 variant="outlined"
                 fullWidth
                 aria-label="Enter your email address"
-                placeholder="Your email address"
+                placeholder={t('footer.newsletter.emailPlaceholder')}
                 slotProps={{
                   htmlInput: {
                     autoComplete: 'off',
-                    'aria-label': 'Enter your email address',
+                    'aria-label': t('footer.newsletter.emailPlaceholder'),
                   },
                 }}
                 sx={{ width: '250px' }}
@@ -86,7 +89,7 @@ export default function Footer() {
                 size="small"
                 sx={{ flexShrink: 0 }}
               >
-                Subscribe
+              {t('footer.newsletter.subscribe')}
               </Button>
             </Stack>
           </Box>
@@ -99,22 +102,16 @@ export default function Footer() {
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            Product
+            {t('footer.product.title')}
           </Typography>
-          <Link color="text.secondary" variant="body2" href="#">
-            Features
+          <Link color="text.secondary" variant="body2" component={RouterLink} to={lp('/#features')}>
+            {t('footer.product.features')}
           </Link>
-          <Link color="text.secondary" variant="body2" href="#">
-            Testimonials
+          <Link color="text.secondary" variant="body2" component={RouterLink} to={lp('/#highlights')}>
+            {t('footer.product.highlights')}
           </Link>
-          <Link color="text.secondary" variant="body2" href="#">
-            Highlights
-          </Link>
-          <Link color="text.secondary" variant="body2" href="#">
-            Pricing
-          </Link>
-          <Link color="text.secondary" variant="body2" href="#">
-            FAQs
+          <Link color="text.secondary" variant="body2" component={RouterLink} to={lp('/#faq')}>
+            {t('footer.product.faqs')}
           </Link>
         </Box>
         <Box
@@ -125,16 +122,13 @@ export default function Footer() {
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            Company
+            {t('footer.company.title')}
           </Typography>
-          <Link color="text.secondary" variant="body2" href="#">
-            About us
+          <Link color="text.secondary" variant="body2" component={RouterLink} to={lp('/about')}>
+            {t('footer.company.about')}
           </Link>
-          <Link color="text.secondary" variant="body2" href="#">
-            Careers
-          </Link>
-          <Link color="text.secondary" variant="body2" href="#">
-            Press
+          <Link color="text.secondary" variant="body2" component={RouterLink} to={lp('/blog')}>
+            {t('nav.blog')}
           </Link>
         </Box>
         <Box
@@ -145,16 +139,16 @@ export default function Footer() {
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            Legal
+            {t('footer.legal.title')}
           </Typography>
-          <Link color="text.secondary" variant="body2" href="#">
-            Terms
+          <Link color="text.secondary" variant="body2" href="https://app.cx-assistant.com/legal/terms" target="_blank" rel="noopener noreferrer">
+            {t('footer.legal.terms')}
           </Link>
-          <Link color="text.secondary" variant="body2" href="#">
-            Privacy
+          <Link color="text.secondary" variant="body2" href="https://app.cx-assistant.com/legal/privacy" target="_blank" rel="noopener noreferrer">
+            {t('footer.legal.privacy')}
           </Link>
-          <Link color="text.secondary" variant="body2" href="#">
-            Contact
+          <Link color="text.secondary" variant="body2" component={RouterLink} to={lp('/contact')}>
+            {t('footer.legal.contact')}
           </Link>
         </Box>
       </Box>
@@ -169,14 +163,14 @@ export default function Footer() {
         }}
       >
         <div>
-          <Link color="text.secondary" variant="body2" href="#">
-            Privacy Policy
+          <Link color="text.secondary" variant="body2" href="https://app.cx-assistant.com/legal/privacy" target="_blank" rel="noopener noreferrer">
+            {t('footer.privacyPolicy')}
           </Link>
           <Typography sx={{ display: 'inline', mx: 0.5, opacity: 0.5 }}>
             &nbsp;•&nbsp;
           </Typography>
-          <Link color="text.secondary" variant="body2" href="#">
-            Terms of Service
+          <Link color="text.secondary" variant="body2" href="https://app.cx-assistant.com/legal/terms" target="_blank" rel="noopener noreferrer">
+            {t('footer.termsOfService')}
           </Link>
           <Copyright />
         </div>
@@ -186,7 +180,7 @@ export default function Footer() {
           useFlexGap
           sx={{ justifyContent: 'left', color: 'text.secondary' }}
         >
-          <IconButton
+         {/*  <IconButton
             color="inherit"
             size="small"
             href="https://github.com/mui"
@@ -203,11 +197,11 @@ export default function Footer() {
             sx={{ alignSelf: 'center' }}
           >
             <TwitterIcon />
-          </IconButton>
+          </IconButton> */}
           <IconButton
             color="inherit"
             size="small"
-            href="https://www.linkedin.com/company/mui/"
+            href="https://www.linkedin.com/company/cx-assistant"
             aria-label="LinkedIn"
             sx={{ alignSelf: 'center' }}
           >

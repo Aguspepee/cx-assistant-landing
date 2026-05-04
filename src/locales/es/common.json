@@ -1,0 +1,60 @@
+{
+  "nav": {
+    "highlights": "Funcionalidades",
+    "features": "Características",
+    "faq": "FAQ",
+    "blog": "Blog",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse"
+  },
+  "langSwitcher": {
+    "label": "Idioma"
+  },
+  "footer": {
+    "newsletter": {
+      "title": "Suscríbete al newsletter",
+      "subtitle": "Actualizaciones semanales. Sin spam.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Tu dirección de email",
+      "subscribe": "Suscribirse"
+    },
+    "product": {
+      "title": "Producto",
+      "features": "Funcionalidades",
+      "highlights": "Highlights",
+      "faqs": "FAQs"
+    },
+    "company": {
+      "title": "Empresa",
+      "about": "Sobre nosotros",
+      "careers": "Trabaja con nosotros",
+      "press": "Prensa"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Términos",
+      "privacy": "Privacidad",
+      "contact": "Contacto"
+    },
+    "privacyPolicy": "Política de Privacidad",
+    "termsOfService": "Términos de Servicio",
+    "copyright": "Copyright"
+  },
+  "actions": {
+    "readMore": "Leer más",
+    "viewAllPosts": "Ver todos los artículos",
+    "getStarted": "Comenzar →",
+    "seeAllFeatures": "Ver todas las funcionalidades",
+    "startForFree": "Empezar gratis",
+    "contactUs": "Contáctanos",
+    "allPosts": "Todos los artículos",
+    "share": "Compartir",
+    "sharePost": "Compartir este artículo",
+    "shareLinkedIn": "Compartir en LinkedIn",
+    "copyLink": "Copiar enlace",
+    "copied": "¡Copiado!"
+  },
+  "meta": {
+    "minRead": "min de lectura"
+  }
+}

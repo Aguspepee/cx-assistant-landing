@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Home -->
+  <url>
+    <loc>https://cx-assistant.com/en/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cx-assistant.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cx-assistant.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cx-assistant.com/en/"/>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://cx-assistant.com/es/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cx-assistant.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cx-assistant.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cx-assistant.com/en/"/>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Blog list -->
+  <url>
+    <loc>https://cx-assistant.com/en/blog</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cx-assistant.com/en/blog"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cx-assistant.com/es/blog"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cx-assistant.com/en/blog"/>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cx-assistant.com/es/blog</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cx-assistant.com/en/blog"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cx-assistant.com/es/blog"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cx-assistant.com/en/blog"/>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blog post: why-commissioning-teams-still-track-documentation-in-excel -->
+  <url>
+    <loc>https://cx-assistant.com/en/blog/why-commissioning-teams-still-track-documentation-in-excel</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cx-assistant.com/en/blog/why-commissioning-teams-still-track-documentation-in-excel"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cx-assistant.com/es/blog/why-commissioning-teams-still-track-documentation-in-excel"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cx-assistant.com/en/blog/why-commissioning-teams-still-track-documentation-in-excel"/>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cx-assistant.com/es/blog/why-commissioning-teams-still-track-documentation-in-excel</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cx-assistant.com/en/blog/why-commissioning-teams-still-track-documentation-in-excel"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cx-assistant.com/es/blog/why-commissioning-teams-still-track-documentation-in-excel"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cx-assistant.com/en/blog/why-commissioning-teams-still-track-documentation-in-excel"/>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blog post: plan-vs-actual-in-commissioning-why-its-harder-than-it-looks -->
+  <url>
+    <loc>https://cx-assistant.com/en/blog/plan-vs-actual-in-commissioning-why-its-harder-than-it-looks</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cx-assistant.com/en/blog/plan-vs-actual-in-commissioning-why-its-harder-than-it-looks"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cx-assistant.com/es/blog/plan-vs-actual-in-commissioning-why-its-harder-than-it-looks"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cx-assistant.com/en/blog/plan-vs-actual-in-commissioning-why-its-harder-than-it-looks"/>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cx-assistant.com/es/blog/plan-vs-actual-in-commissioning-why-its-harder-than-it-looks</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cx-assistant.com/en/blog/plan-vs-actual-in-commissioning-why-its-harder-than-it-looks"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cx-assistant.com/es/blog/plan-vs-actual-in-commissioning-why-its-harder-than-it-looks"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cx-assistant.com/en/blog/plan-vs-actual-in-commissioning-why-its-harder-than-it-looks"/>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Contact -->
+  <url>
+    <loc>https://cx-assistant.com/en/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cx-assistant.com/en/contact"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cx-assistant.com/es/contact"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cx-assistant.com/en/contact"/>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://cx-assistant.com/es/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cx-assistant.com/en/contact"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cx-assistant.com/es/contact"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cx-assistant.com/en/contact"/>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>

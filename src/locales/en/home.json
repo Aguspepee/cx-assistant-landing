@@ -1,0 +1,234 @@
+{
+  "hero": {
+    "badge": "REDEFINING COMMISSIONING",
+    "phrases": [
+      "Empowering Commissioning",
+      "AI Built for Engineers",
+      "Resolve Issues Faster",
+      "Plan with Ease"
+    ],
+    "subtitle": "Cx Assistant helps commissioning teams capture issues, plan milestones, and deliver faster with AI support.",
+    "ctaPrimary": "Get Started →",
+    "ctaSecondary": "Read our blog",
+    "chat": {
+      "online": "online",
+      "inputPlaceholder": "Type a message…",
+      "disclaimer": "AI may make mistakes — verify important details.",
+      "greeting": "Hey! How can I help you today? 👋"
+    },
+    "chatTurns": [
+      {
+        "userText": "Hey! Can you tell me how many issues are open?",
+        "assistantText": "📋 There are 636 issues with status 'open'.",
+        "thinkingLabel": "Querying issues…"
+      },
+      {
+        "userText": "What is the serial number of the #NL_IRE33_L0_028_UPS1B01?",
+        "assistantText": "The serial number of the #NL_IRE33_L0_028_UPS1B01 is 06-7M71593-01.",
+        "thinkingLabel": "Looking up asset…"
+      },
+      {
+        "userText": "Any news about issue 456?",
+        "assistantText": "🔷 History for issue #456 — Strange Whine from TX03B Under Load:\n2025-08-01 · assignee: Agustín Ezequiel\n2026-03-04 · status: open → closed",
+        "thinkingLabel": "Fetching issue…"
+      },
+      {
+        "userText": "Can you reopen that issue?",
+        "assistantText": "✅ Issue #456 \"Strange Whine from TX03B Under Load\" updated to status Open.",
+        "thinkingLabel": "Updating issue…"
+      },
+      {
+        "userText": "Load the nameplate data to the UPS1B01 please",
+        "assistantText": "🖨️ Nameplate read for NL_IRE33_L0_028_UPS1B01 — confidence 90%",
+        "thinkingLabel": "Reading nameplate…"
+      },
+      {
+        "userText": "Can you give me an overview of the issues?",
+        "assistantText": "Sure thing! I've just built this chart for you 📊",
+        "thinkingLabel": "Analysing issues…"
+      },
+      {
+        "userText": "Create an issue for the TX45 — broken temperature sensor",
+        "assistantText": "✅ Issue created with ID 874: \"TX45 temperature sensor broken\"",
+        "thinkingLabel": "Creating issue…"
+      },
+      {
+        "userText": "Can you give me the NL_IRE33_L0_025_BAT1A02 FAT document?",
+        "assistantText": "Here is the FAT document for BAT1A02:",
+        "thinkingLabel": "Fetching document…"
+      }
+    ],
+    "nameplate": {
+      "applied": "✅ Applied (3)",
+      "voltage": "Voltage",
+      "serialNo": "Serial No.",
+      "power": "Power"
+    },
+    "barChart": {
+      "title": "Issues by Priority & Status",
+      "subtitle": "Current issue distribution"
+    },
+    "issueForm": {
+      "editing": "Editing Issue #874",
+      "titleLabel": "Title",
+      "descriptionLabel": "Description",
+      "assignedToLabel": "Assigned To",
+      "unassigned": "Unassigned",
+      "statusLabel": "Status",
+      "open": "Open",
+      "assignAction": "Assign to Ana",
+      "closeAction": "Close Issue"
+    }
+  },
+  "highlights": {
+    "title": "Everything in one place",
+    "subtitle": "Structured, searchable, and secure project management tailored for the MEP and commissioning industry.",
+    "assetTracking": {
+      "title": "Asset Tracking",
+      "description": "Track every piece of equipment from delivery to final handover with granular status updates and historical logs."
+    },
+    "issueManagement": {
+      "title": "Issue Management",
+      "description": "A robust \"punch list\" reimagined. Assign responsibilities, set priorities, and track resolutions in real-time."
+    },
+    "documentation": {
+      "title": "Documentation",
+      "description": "Centralized repository for checklists, test scripts, and certifications. Auto-generate professional PDF reports with one click."
+    }
+  },
+  "chatSection": {
+    "eyebrow": "AI ASSISTANT",
+    "title": "Your project,",
+    "titleHighlight": "always at hand.",
+    "description": "Ask questions in plain language, create issues, update assets, and retrieve documents — all from a single conversation. No switching tabs, no searching through spreadsheets.",
+    "bullet1": "Query issues, assets & documents by name or tag",
+    "bullet2": "Create and update records with a single message",
+    "bullet3": "Read nameplates and attach photos on the fly",
+    "bullet4": "Retrieve FAT documents and certifications instantly"
+  },
+  "aiFeature": {
+    "title": "AI that understands",
+    "titleHighlight": "commissioning.",
+    "description": "Don't just store data—understand it. Our built-in assistant parses your project documentation to answer complex queries, flag inconsistencies, and suggest resolutions based on project history.",
+    "feature1": "Instant trend analysis and forecasting",
+    "feature2": "Automated technical review of test results",
+    "chatUser": "\"Summarize the open critical issues for AHU-01 and tell me who is responsible for the last update.\"",
+    "chatAssistant": "\"There are 2 critical issues for AHU-01: 1) Fan vibration alert, 2) BMS communication timeout. Both were last updated by Sarah M. on Tuesday.\"",
+    "inputPlaceholder": "Ask about your project..."
+  },
+  "featureShowcase": {
+    "eyebrow": "PLATFORM FEATURES",
+    "sectionTitle": "Built for every step of commissioning",
+    "sectionSubtitle": "From first equipment delivery to final handover — one platform, zero gaps.",
+    "dashboard": {
+      "eyebrow": "ANALYTICS",
+      "title": "Command-center",
+      "titleHighlight": "visibility",
+      "description": "Monitor asset health, issue velocity, and schedule adherence in a single view. Spot deviations before they become delays.",
+      "bullet1": "Plan vs Actual progress tracking",
+      "bullet2": "Issue velocity & priority breakdown"
+    },
+    "assets": {
+      "eyebrow": "ASSET MANAGEMENT",
+      "title": "Every asset,",
+      "titleHighlight": "under control",
+      "description": "Track every piece of equipment with color-coded commissioning tags. Filter, drill in, and access full technical specs and linked documentation for any asset.",
+      "bullet1": "Color-coded tag workflow (Red → White)",
+      "bullet2": "Per-asset technical data and linked docs"
+    },
+    "issues": {
+      "eyebrow": "ISSUE TRACKING",
+      "title": "Issues resolved,",
+      "titleHighlight": "not forgotten",
+      "description": "A powerful punch list reimagined. Log field issues from photo or text, assign teams, set priorities, and maintain a full photo-rich audit trail.",
+      "bullet1": "AI-assisted issue creation from text or photo",
+      "bullet2": "Full audit trail with photo evidence"
+    },
+    "documentation": {
+      "eyebrow": "DOCUMENTATION",
+      "title": "All your docs,",
+      "titleHighlight": "always ready",
+      "description": "Upload, version, and preview FAT reports, test scripts, and certificates — all in one place with an inline PDF viewer and versioning workflow.",
+      "bullet1": "Organized folder tree with version control",
+      "bullet2": "In-browser PDF preview — no downloads needed"
+    },
+    "tracker": {
+      "eyebrow": "DOC TRACKER",
+      "title": "Know what's missing",
+      "titleHighlight": "before handover",
+      "description": "Map required documents to each asset and track completion across L1, L2, L3, and Handover phases. Approve, link, or flag documents directly from the tracker.",
+      "bullet1": "Per-asset completion view across all phases",
+      "bullet2": "Link, approve, and flag in one click"
+    }
+  },
+  "blogPreview": {
+    "eyebrow": "From the Blog",
+    "title": "Engineering insights",
+    "subtitle": "Deep dives into commissioning challenges and how we're solving them.",
+    "viewAll": "View all posts"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Simple, transparent pricing for every team size.",
+    "perMonth": "/ month",
+    "selected": "Selected",
+    "tiers": {
+      "basic": {
+        "title": "Basic",
+        "subtitle": "For small teams",
+        "features": ["Issues", "Assets", "Documentation manager", "Documentation tracker"],
+        "footer": ["Users 5", "Storage 5 GB"],
+        "cta": "Get started"
+      },
+      "pro": {
+        "title": "Pro",
+        "subtitle": "Best for growing teams",
+        "features": [
+          "Issues & Assets",
+          "Documentation manager & tracker",
+          "AI assistant (chat)",
+          "AI-assisted documentation"
+        ],
+        "footer": ["Users 20", "Storage 50 GB"],
+        "cta": "Start now"
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "subtitle": "Tailored commissioning platform",
+        "features": [
+          "Everything in Pro",
+          "Custom modules & dashboards",
+          "Project-specific workflows",
+          "Tailored onboarding"
+        ],
+        "footer": [],
+        "cta": "Contact us"
+      }
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "items": [
+      {
+        "question": "What is Cx Assistant?",
+        "answer": "Cx Assistant is a next-generation commissioning platform for complex environments. It combines a powerful management app with an AI assistant to automate tasks, enhance collaboration, and ensure flawless project delivery."
+      },
+      {
+        "question": "How does the AI assistant help engineers?",
+        "answer": "The AI assistant automates repetitive tasks, links issues to assets, and provides instant answers to natural language questions. It helps engineers spend less time on admin and more time on actual engineering."
+      },
+      {
+        "question": "What types of projects is Cx Assistant built for?",
+        "answer": "Cx Assistant is designed for data centers, industrial facilities, and critical infrastructure—anywhere commissioning is complex, high-stakes, and time-critical."
+      },
+      {
+        "question": "How does Cx Assistant support compliance and quality?",
+        "answer": "Cx Assistant highlights missing signatures, incomplete fields, and mismatched IDs, ensuring compliance before handover. AI-powered validation catches errors before they become risks."
+      }
+    ]
+  },
+  "seo": {
+    "homeTitle": "Cx Assistant — AI Commissioning Platform for Engineering Teams",
+    "homeDescription": "Cx Assistant is an AI-powered commissioning platform that helps engineering teams manage issues, assets, and documentation — faster, smarter, and more consistently."
+  }
+}

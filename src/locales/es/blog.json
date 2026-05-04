@@ -1,0 +1,20 @@
+{
+  "list": {
+    "title": "Blog",
+    "subtitle": "Insights de ingeniería, novedades del producto y buenas prácticas de commissioning.",
+    "seoTitle": "Blog | Cx Assistant",
+    "seoDescription": "Insights de ingeniería, novedades del producto y buenas prácticas de commissioning del equipo de Cx Assistant."
+  },
+  "post": {
+    "allPosts": "Todos los artículos",
+    "share": "Compartir:",
+    "shareTooltip": "Compartir este artículo",
+    "linkedInTooltip": "Compartir en LinkedIn",
+    "copyLinkTooltip": "Copiar enlace",
+    "copiedTooltip": "¡Copiado!",
+    "linkCopied": "Enlace copiado al portapapeles",
+    "ctaTitle": "¿Quieres ver Cx Assistant en acción?",
+    "ctaSubtitle": "Explora cómo los equipos de commissioning gestionan assets, issues y documentación — en un solo lugar.",
+    "ctaButton": "Empezar gratis"
+  }
+}

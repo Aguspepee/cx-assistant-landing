@@ -1,0 +1,20 @@
+{
+  "list": {
+    "title": "Blog",
+    "subtitle": "Engineering insights, product updates, and commissioning best practices.",
+    "seoTitle": "Blog | Cx Assistant",
+    "seoDescription": "Engineering insights, product updates, and commissioning best practices from the Cx Assistant team."
+  },
+  "post": {
+    "allPosts": "All posts",
+    "share": "Share:",
+    "shareTooltip": "Share this post",
+    "linkedInTooltip": "Share on LinkedIn",
+    "copyLinkTooltip": "Copy link",
+    "copiedTooltip": "Copied!",
+    "linkCopied": "Link copied to clipboard",
+    "ctaTitle": "Want to see Cx Assistant in action?",
+    "ctaSubtitle": "Explore how commissioning teams manage assets, issues, and documentation — in one place.",
+    "ctaButton": "Start for free"
+  }
+}
